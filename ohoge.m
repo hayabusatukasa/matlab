@@ -1,4 +1,5 @@
-% function ohoge(filename,s_start,s_end)
+function [N_specif,wstruct] = ohoge(filename,s_start,s_end)
+%% 前処理
 audio_info = audioinfo(filename);
 fs = audio_info.SampleRate;
 audio = audioread(filename, [s_start*fs+1,s_end*fs]);
@@ -6,30 +7,22 @@ if audio_info.NumChannels > 1
     audio = (audio(:,1)+audio(:,2))/2;
 end
 
-mstruct = mirstruct;
-mstruct.tmp.a = miraudio(0,1);
-ma = miraudio(audio,fs);
-mstruct.ma.audio = ma;
-ma_frame = mirframe(ma,'Length',0.2,'s','Hop',.5);
-ma_mel = mirspectrum(ma_frame,'dB','Mel','Length',1024);
-ma_env = mirenvelope(ma,'Tau',0.2);
-ma_peaks = mirpeaks(ma_env,'Threshold',0.5,'Contrast',0.5);
-
-deltaT = 1.0;   % length of the signal in sec
-shiftT = 0.5;   % shift length in sec
-P0 = 2e-5;      % sound pressure level reference in Pa
-N_tot = []; N_specif = []; LN = []; 
 % N_tot     : total loudness, in sone
 % N_specif  : specific loudness, in sone/bark
 % BarkAxis  : vector of Bark band numbers used for N_specif computation
 % LN        : loudness level,in phon
+deltaT = 1.0;   % length of the signal in sec
+shiftT = 0.5;   % shift length in sec
+P0 = 2e-5;      % sound pressure level reference in Pa
+N_tot = []; N_specif = []; LN = []; 
 N_time = [];
 j = 1;
 deltaS = fs * deltaT;
 shiftS = fs * shiftT;
 endS = length(audio)-deltaS;
+
+%% calculate loudness
 for i=0:shiftS:endS
-%     display(['calculating ', int2str(j)]);
     VectNiv30ct = gene_ThirdOctave_levels(audio(i+1:i+deltaS),fs,deltaT,P0);
     VectNiv30ct = VectNiv30ct(1:28,:);
     VectNiv30ct = VectNiv30ct(:);
@@ -40,20 +33,44 @@ for i=0:shiftS:endS
     j = j + 1;
 end
 
+%% get various parameters from loudness
 nelem = numel(N_specif(:,1));
 for i=1:nelem
     for j=1:24
-        display([int2str(i),' ',int2str(j)]);
         N_specif_tmp(j,:) = N_specif(i,(j-1)*10+1:(j-1)*10+10);
     end
     wstruct.N_specif(i).ary = N_specif_tmp;
 end
-
+wstruct.time = N_time;  % フレームの区間
+wstruct.total = N_tot;  % ラウドネスの面積
+wstruct.LN = LN;        % ラウドネスレベル
 for i=1:nelem
-    wstruct.means(i,:) = mean(wstruct.N_specif(i).ary');
+    % ラウドネス密度を24個に分割してそれぞれの面積を求める
+    wstruct.mean(i,:) = mean(wstruct.N_specif(i).ary');
+    % ラウドネス密度から極大点を2個見つける
+    clear tmp;
+    [~,tmp] = findpeaks(N_specif(i,:),'NPEAKS',2,'SORTSTR','descend');
+    if length(tmp) < 2
+        if length(tmp) < 1
+            tmp = 0;
+        end
+        tmp(2) = 0;
+    end
+    wstruct.peak1(i) = tmp(1)/10;
+    wstruct.peak2(i) = tmp(2)/10;
+    % シャープネスの算出
+    wstruct.sharp(i) = sharpness(BarkAxis,N_specif(i,:),N_tot(i));
 end
 
-wstruct.mean = mean(N_specif_Bark');
-wfilename = ['C:\Users\Shunji\Documents\','Table_Loudness_mean.csv'];
-csvwrite(wfilename,wstruct.mean);
-% end
+%% write csv file
+clear tmp;
+% tmp = horzcat(N_time(:,1),wstruct.mean);
+% tmp = cat(1,[0:24],tmp);
+T = table(wstruct.time(:,1),wstruct.LN',wstruct.sharp',...
+     wstruct.peak1',wstruct.peak2','VariableNames',...
+     {'Time','LN','Sharpness','Peak1','Peak2'});
+wPass = 'C:\Users\Shunji\Documents\環境音csv\Loudness141111_001\';
+wFilename = [wPass,'Table_Loudness_Parameters_',...
+    num2str(deltaT),'deltaT',num2str(s_start),'-',num2str(s_end),'.csv'];
+writetable(T,wFilename);
+end
