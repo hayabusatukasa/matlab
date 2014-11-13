@@ -1,8 +1,9 @@
 function [N_specif,wstruct] = ohoge(filename,s_start,s_end)
 %% ‘Oˆ—
-audio_info = audioinfo(filename);
+filename_withWAV = [filename,'.WAV'];
+audio_info = audioinfo(filename_withWAV);
 fs = audio_info.SampleRate;
-audio = audioread(filename, [s_start*fs+1,s_end*fs]);
+audio = audioread(filename_withWAV, [s_start*fs+1,s_end*fs]);
 if audio_info.NumChannels > 1
     audio = (audio(:,1)+audio(:,2))/2;
 end
@@ -69,7 +70,7 @@ clear tmp;
 T = table(wstruct.time(:,1),wstruct.LN',wstruct.sharp',...
      wstruct.peak1',wstruct.peak2','VariableNames',...
      {'Time','LN','Sharpness','Peak1','Peak2'});
-wPass = 'C:\Users\Shunji\Documents\ŠÂ‹«‰¹csv\Loudness141111_001\';
+wPass = ['C:\Users\Shunji\Documents\ŠÂ‹«‰¹csv\Loudness',filename,'\'];
 wFilename = [wPass,'Table_Loudness_Parameters_',...
     num2str(deltaT),'deltaT',num2str(s_start),'-',num2str(s_end),'.csv'];
 writetable(T,wFilename);

@@ -10,7 +10,10 @@ function S = sharpness(BarkAxis,N_specif,N_tot)
 % 章 忠（豊橋技術科学大学）
 
 w = zeros(1,length(BarkAxis));  % 重みの初期化
-C = 0.11;   % 定数
+
+% 中心バンド1000Hz，バンド幅160Hzのフィルターを通過させた
+% ホワイトノイズでシャープネスが1となるような定数
+C = 1/91.6582;   
 
 % 重みの計算
 for i=1:length(BarkAxis)

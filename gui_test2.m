@@ -22,7 +22,7 @@ function varargout = gui_test2(varargin)
 
 % Edit the above text to modify the response to help gui_test2
 
-% Last Modified by GUIDE v2.5 11-Nov-2014 12:15:04
+% Last Modified by GUIDE v2.5 13-Nov-2014 11:32:28
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -104,22 +104,23 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-% --- Executes on button press in pushbutton1.
-function pushbutton1_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton1 (see GCBO)
+% --- Executes on button press in plotbutton.
+function plotbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to plotbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+filename = get(handles.Filename,'String');
 index = get(handles.popupmenu1,'Value');
-load('ws_20141105.mat');
+matfname = ['ws_',filename,'.mat'];
+load(matfname);
 x = 1:24;
 y = 0:0.5:59;
 surf(handles.for_surf,x,y,ws(index).mean);
-for i=1:120; tmp(i,:) = gene_sone2phon_ISO532B(sum(ws(i).mean')); end
-plot(handles.for_loudnesslevel,y,tmp(index,:));
-ylim(handles.for_loudnesslevel,[60,100]);
+% for i=1:120; tmp(i,:) = gene_sone2phon_ISO532B(sum(ws(i).mean')); end
+plot(handles.for_loudnesslevel,y,ws(index).LN);
+ylim(handles.for_loudnesslevel,[60,90]);
 plot(handles.for_sharp,y,ws(index).sharp); 
-ylim(handles.for_sharp,[8,25]);
+% ylim(handles.for_sharp,[8,25]);
 
 % --- Executes on button press in pushbutton2.
 function pushbutton2_Callback(hObject, eventdata, handles)
@@ -132,7 +133,7 @@ s_start = get(handles.s_start,'Value') - 1;
 s_end = get(handles.s_end,'Value');
 if s_start < s_end
     fs = 44100;
-    a = audioread('141105_001.WAV',...
+    a = audioread([filename,'.WAV'],...
         [fs*(60*(index-1)+s_start)+1,fs*(60*(index-1)+s_end)]);
     a = (a(:,1)+a(:,2))/2;
     ma = miraudio(a,fs);
@@ -275,4 +276,37 @@ function Filename_CreateFcn(hObject, eventdata, handles)
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pushbutton3.
+function pushbutton3_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+filename = get(handles.Filename,'String');
+matfname = ['ws_',filename,'.mat'];
+load(matfname);
+set(handles.popupmenu1,'String',[0:(numel(ws)-1)]');
+
+
+% --- Executes on slider movement.
+function slider1_Callback(hObject, eventdata, handles)
+% hObject    handle to slider1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+
+% --- Executes during object creation, after setting all properties.
+function slider1_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to slider1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
