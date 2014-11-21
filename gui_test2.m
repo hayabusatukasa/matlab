@@ -121,6 +121,12 @@ plot(handles.for_loudnesslevel,y,ws(index).LN);
 ylim(handles.for_loudnesslevel,[60,90]);
 plot(handles.for_sharp,y,ws(index).sharp); 
 % ylim(handles.for_sharp,[8,25]);
+data1 = csvread(['wdataver2_',filename,'.csv'],1,3);
+data2 = csvread(['wdataver2_',filename,'.csv'],1,4);
+bar(handles.for_score,y,data1((index-1)*119+1:(index-1)*119+119)); 
+ylim(handles.for_score,[0,100]); xlim(handles.for_score,[0,60]);
+bar(handles.for_score2,y,data2((index-1)*119+1:(index-1)*119+119)); 
+ylim(handles.for_score2,[0,100]); xlim(handles.for_score2,[0,60]);
 
 % --- Executes on button press in pushbutton2.
 function pushbutton2_Callback(hObject, eventdata, handles)
