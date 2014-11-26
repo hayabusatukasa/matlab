@@ -1,0 +1,13 @@
+m = 0;%1.092;
+sd = 0.01;
+a1 = -log(0.001)/sd;
+% a1 = 30;
+a2 = a1;
+fs= 44100;
+t1 = linspace(m-sd*2,m,fs); 
+t2 = linspace(m,m+sd*2,fs); 
+sig1 = 1./(1+exp(-a1*(t1-m+sd))); 
+sig2 = 1./(1+exp(a2*(t2-m-sd))); 
+sig=horzcat(sig1,sig2); 
+t = horzcat(t1,t2); 
+figure; plot(t,sig);
