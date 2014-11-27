@@ -113,20 +113,24 @@ filename = get(handles.Filename,'String');
 index = get(handles.popupmenu1,'Value');
 matfname = ['ws_',filename,'.mat'];
 load(matfname);
+data_len = 120;
 x = 1:24;
-y = 0:0.5:59;
+y = 0:0.5:59.5;
 surf(handles.for_surf,x,y,ws(index).mean);
 % for i=1:120; tmp(i,:) = gene_sone2phon_ISO532B(sum(ws(i).mean')); end
 plot(handles.for_loudnesslevel,y,ws(index).LN);
-ylim(handles.for_loudnesslevel,[60,90]);
+ylim(handles.for_loudnesslevel,[60,100]);
 plot(handles.for_sharp,y,ws(index).sharp); 
 % ylim(handles.for_sharp,[8,25]);
-data1 = csvread(['wdataver2_',filename,'.csv'],1,3);
-data2 = csvread(['wdataver2_',filename,'.csv'],1,4);
-bar(handles.for_score,y,data1((index-1)*119+1:(index-1)*119+119)); 
+data1 = csvread(['wdataver3_',filename,'.csv'],1,3);
+data2 = csvread(['wdataver3_',filename,'.csv'],1,4);
+data3 = csvread(['wdataver3_',filename,'.csv'],1,5);
+bar(handles.for_score,y,data1((index-1)*data_len+1:(index-1)*data_len+data_len)); 
 ylim(handles.for_score,[0,100]); xlim(handles.for_score,[0,60]);
-bar(handles.for_score2,y,data2((index-1)*119+1:(index-1)*119+119)); 
+bar(handles.for_score2,y,data2((index-1)*data_len+1:(index-1)*data_len+data_len)); 
 ylim(handles.for_score2,[0,100]); xlim(handles.for_score2,[0,60]);
+bar(handles.for_score3,y,data3((index-1)*data_len+1:(index-1)*data_len+data_len)); 
+ylim(handles.for_score3,[0,100]); xlim(handles.for_score3,[0,60]);
 
 % --- Executes on button press in pushbutton2.
 function pushbutton2_Callback(hObject, eventdata, handles)

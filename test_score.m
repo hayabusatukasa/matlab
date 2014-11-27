@@ -1,5 +1,5 @@
 clear all;
-filename = '141121_001';
+filename = '141111_001';
 data = readtable(['wdataver3_',filename,'.csv']);
 range_time = length(data.Var1);
 sample_pickup = 33;
@@ -42,8 +42,8 @@ for i=1:10
     audio(i,(end-fade*2+1):end) = audio(i,(end-fade*2+1):end).*fadeout;
     
     % write audio
-    s_tmp = int16(T.t_start(i));
-    e_tmp = int16(T.t_end(i));
+    s_tmp = int32(T.t_start(i));
+    e_tmp = int32(T.t_end(i));
     wfname = ['\Users\Shunji\Music\RamdomPickup\','rank',num2str(i),...
         '_time',num2str(s_tmp),'-',num2str(e_tmp),'.wav'];
     audiowrite(wfname,audio(i,:),fs);
