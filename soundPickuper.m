@@ -54,6 +54,8 @@ end
 t_total = cputime - t_total;
 display(['トータルの計算時間は ',num2str(t_total),' 秒です']);
 
+clear t_time t_sp t_db t_cent t_chro t_part t_total s_start s_end;
+
 %% 点数計算
 [score1,score2] = calcScore(time,db,cent,shiftT);
 
@@ -61,10 +63,12 @@ display(['トータルの計算時間は ',num2str(t_total),' 秒です']);
 score_total = score1+score2;
 T = table(time,db,cent,score1',score2',score_total','VariableNames',...
     {'time','dB','cent','score1','score2','total'});
-T2 = table(time,db,cent,array_med_db',array_sd_db',array_med_cent',array_sd_cent',...
-    'VariableNames',{'time','db','cent','med_db','sd_db','med_cent','sd_cent'});
+% T2 = table(time,db,cent,array_med_db',array_sd_db',array_med_cent',array_sd_cent',...
+%     'VariableNames',{'time','db','cent','med_db','sd_db','med_cent','sd_cent'});
 writetable(T,['T_',fname_withoutWAV,'.csv']);
-writetable(T2,['T2_',fname_withoutWAV,'.csv']);
+% writetable(T2,['T2_',fname_withoutWAV,'.csv']);
+
+clear time dB cent score1 score2 total;
 
 %% 場面の切り出し
 thsld_score = 20;
