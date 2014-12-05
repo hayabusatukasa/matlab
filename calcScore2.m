@@ -1,5 +1,5 @@
-function [score1,score2] = calcScore(time,db,cent,shiftT)
-% スコア2の平均と標準偏差をとるデータの間隔 in sample
+function score = calcScore2(time,db,cent,shiftT)
+% スコア2の中央値と標準偏差をとるデータの間隔 in sample
 sec = 30/shiftT;    
 
 % 一定以上のdBを持つインデックスのみを取り出す
@@ -10,19 +10,8 @@ upperthsld = (db>=thsld_db);
 db_upperthsld = db(upperthsld);
 cent_upperthsld = cent(upperthsld);
 
-% スコア1の計算に用いる，全体を見たときの平均と標準偏差
-me_db = median(db_upperthsld);
-sd_db = std(db_upperthsld);
-me_cent = median(cent_upperthsld);
-sd_cent = std(cent_upperthsld);
-
 len = length(time);
 for i=1:len
-    % スコア1の計算
-    score1_db(i) = detcurve(db(i),me_db,sd_db);
-    score1_cent(i) = detcurve(cent(i),me_cent,sd_cent);
-    score1(i) = getscore(score1_db(i),score1_cent(i));
-    
     % 現在のインデックスを中心として，一定区間をとる
     if i>sec && i<=(len-sec)
         tmp_db = db((i-sec):(i+sec));
@@ -53,8 +42,8 @@ for i=1:len
     end
     
     % スコア2の計算
-    score2_db(i) = detcurve(db(i),me_tmp_db,sd_tmp_db);
-    score2_cent(i)= detcurve(cent(i),me_tmp_cent,sd_tmp_cent);
-    score2(i) = getscore(score2_db(i),score2_cent(i));
+    score_db(i) = detcurve(db(i),me_tmp_db,sd_tmp_db);
+    score_cent(i)= detcurve(cent(i),me_tmp_cent,sd_tmp_cent);
+    score(i) = getscore(score_db(i),score_cent(i));
 end
 end

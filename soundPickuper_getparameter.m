@@ -1,4 +1,4 @@
-function [time,sp,L,cent,chro] = soundPickuper_getparameter...
+function [time,sp,L,cent] = soundPickuper_getparameter...
     (filename_withoutWAV,s_start,s_end,deltaT,shiftT,fft_size)
 % soundPickuperスクリプトにおけるパラメータ取得関数
 % Input:
@@ -14,7 +14,6 @@ function [time,sp,L,cent,chro] = soundPickuper_getparameter...
 %   sp                  : フレームごとのスペクトル
 %   L                   : 等価騒音レベル
 %   cent                : スペクトル重心
-%   chro                : クロマグラム
 
 %% 前処理
 filename_withWAV = [filename_withoutWAV,'.WAV'];
@@ -28,25 +27,20 @@ if audio_info.NumChannels > 1
 end
 
 fft_min = 0;        % 最小の周波数
-fft_max = 20000;    % 最大の周波数
+fft_max = fs/2;    % 最大の周波数
 P0 = 2e-5;          % 基準音圧
 %% パラメータ抽出
 ma = miraudio(audio,fs);
 mfr = mirframe(ma,'Length',deltaT,'s','Hop',shiftT/deltaT);
 msp = mirspectrum(mfr,'Length',fft_size,'Min',fft_min,'Max',fft_max);
 mcent = mircentroid(msp,'MaxEntropy',1.0);
-% mchro = mirchromagram(mfr);
 fr = mirgetdata(mfr)';
 mean_fr = mean(fr.^2,2);
 L = 10*log10(mean_fr/P0^2);
 sp = mirgetdata(msp)';
 cent = mirgetdata(mcent)';
-% chro = mirgetdata(mchro)';
-chro = [];
 time = s_start:shiftT:(s_end-deltaT);
 time = time';
-
-
 
 end
 

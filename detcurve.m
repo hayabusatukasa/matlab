@@ -7,7 +7,7 @@ function result = detcurve(x,m,sd)
 
 % 1/(1+exp(-a*sd))->1‚æ‚èexp(-a*sd)=0.001‚Æ‚È‚éa‚ğ‹‚ß‚é
 % -a*sd = log(0.001) = -6.9078
-a = 6.9078/sd;
+a = -log(0.001)/sd;
 if x<=m
     result = 1/(1+exp(-a*(x-m+sd)));
 else
