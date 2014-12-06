@@ -1,9 +1,9 @@
 % dataT = readtable('T141105_001.csv');
-thsld_score1 = 42;
-thsld_score2 = 55;
-windowSize  = 60;
+thsld_score1 = 5;
+thsld_score2 = 70;
+windowSize  = 20;
 for i=1:length(thsld_score1)
-    [aT_scene,sf] = cutScene(T_param.time,T_param.score2,...
+    [aT_scene,sf] = cutScene(T_param.time,T_param.score,...
         thsld_score1,thsld_score2,windowSize);
     len(i) = height(aT_scene);
 end
