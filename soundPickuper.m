@@ -1,6 +1,6 @@
 clear all;
 %% 前処理
-fname_withoutWAV = '141029_001';
+fname_withoutWAV = '141105_001';
 filename = [fname_withoutWAV,'.WAV'];
 pass = ['\Users\Shunji\Music\RandomPickup\'];
 a_info = audioinfo(filename);
@@ -36,11 +36,10 @@ for i=0:i_stop
     end
     
     % パラメータ取得し，一時変数に格納
-    [t_time,t_sp,t_db,t_cent] = soundPickuper_getparameter...
+    [t_time,t_db,t_cent] = soundPickuper_getparameter...
         (fname_withoutWAV,s_start,s_end,deltaT,shiftT,fft_size);
     
     % 一時変数を結合
-    sp = cat(1,sp,t_sp);
     time = cat(1,time,t_time);
     db = cat(1,db,t_db);
     cent = cat(1,cent,t_cent);
@@ -56,7 +55,7 @@ display(['トータルの計算時間は ',num2str(t_total),' 秒です']);
 clear t_time t_sp t_db t_cent t_part t_total s_start s_end;
 
 %% 点数計算
-score = calcScore2(time,db,cent,shiftT);
+[~,score] = calcScore3(time,db,cent,shiftT);
 
 %%  テーブル作成
 T_param = table(time,db,cent,score','VariableNames',...
@@ -87,6 +86,7 @@ end
 hold off;
 title(['filter-',num2str(windowSize)]);
 xlim([0,T_param.time(end)]);
+ylim([0 100]);
 
 %% 切り出した場面ごとの点数計算
 for i=1:height(T_scene)

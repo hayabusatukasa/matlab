@@ -1,4 +1,4 @@
-function [time,sp,L,cent] = soundPickuper_getparameter...
+function [time,L,cent] = soundPickuper_getparameter...
     (filename_withoutWAV,s_start,s_end,deltaT,shiftT,fft_size)
 % soundPickuperスクリプトにおけるパラメータ取得関数
 % Input:
@@ -37,7 +37,6 @@ mcent = mircentroid(msp,'MaxEntropy',1.0);
 fr = mirgetdata(mfr)';
 mean_fr = mean(fr.^2,2);
 L = 10*log10(mean_fr/P0^2);
-sp = mirgetdata(msp)';
 cent = mirgetdata(mcent)';
 time = s_start:shiftT:(s_end-deltaT);
 time = time';
