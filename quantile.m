@@ -10,7 +10,7 @@ if mod(len,2)==1
     q3 = median(x_sort(mi:end));
 else
     mi = len/2;
-    q2 = median(x_sort);
+    q2 = (x_sort(mi)+x_sort(mi+1))/2;
     q1 = median(x_sort(1:mi));
     q3 = median(x_sort((mi+1):end));
 end

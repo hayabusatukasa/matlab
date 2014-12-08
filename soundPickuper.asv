@@ -1,6 +1,6 @@
 clear all;
 %% 前処理
-fname_withoutWAV = '141111_001';
+fname_withoutWAV = '141121_002';
 filename = [fname_withoutWAV,'.WAV'];
 pass = ['\Users\Shunji\Music\RandomPickup\'];
 a_info = audioinfo(filename);
@@ -8,7 +8,7 @@ fs = a_info.SampleRate;
 dur = a_info.Duration;
 i_stop = ceil(dur/60)-1;
 
-is_getaudio = 1;
+is_getaudio = 0;
 
 %% フレームごとのパラメータ取得
 time = [];      % 時間
@@ -56,17 +56,20 @@ display(['トータルの計算時間は ',num2str(t_total),' 秒です']);
 clear t_time t_db t_cent t_part t_total s_start s_end;
 
 %% 点数計算
-deltaT_calcScore = 30;
-[~,score] = calcScore4(time,db,cent,deltaT_calcScore,shiftT);
+[~,score] = calcScore3(time,db,cent,shiftT);
 
 %%  テーブル作成
 T_param = table(time,db,cent,score','VariableNames',...
     {'time','dB','cent','score'});
 
+clear time dB cent score1;
+
 %% 場面の切り出し
+thsld_low = 10;
+thsld_hi = 20;
 windowSize = 30;
-[T_scene,sf,thsld_hi,thsld_low] = ...
-    cutScene2(T_param.time,T_param.score,windowSize,1);
+[T_scene,sf,] = cutScene(T_param.time,T_param.score,...
+    thsld_low,thsld_hi,windowSize);
 
 % plot
 plotScene(T_param,T_scene,sf,thsld_low,thsld_hi,windowSize);
@@ -76,8 +79,7 @@ for i=1:height(T_scene)
     s_start = T_scene.scene_start(i);
     s_end   = T_scene.scene_end(i);
     T_tmp = T_param((T_param.time>=s_start)&(T_param.time<=s_end),:);
-    [str_scene(i).score,~] = ...
-        calcScore3(T_tmp.time,T_tmp.dB,T_tmp.cent,deltaT_calcScore,shiftT);
+    str_scene(i).score = calcScore3(T_tmp.time,T_tmp.dB,T_tmp.cent,shiftT);
     str_scene(i).time  = T_tmp.time';
 end
 
@@ -104,4 +106,6 @@ if is_getaudio == 1
             audiowrite(wfname,a_tmp,fs);
         end
     end
+    
+    
 end

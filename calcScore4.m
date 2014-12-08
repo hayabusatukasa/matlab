@@ -1,6 +1,8 @@
-function [score1,score2] = calcScore3(time,db,cent,deltaT,shiftT)
+function [score1,score2] = calcScore4(time,db,cent,deltaT,shiftT)
 % 区間全体でのスコアと，各インデックスごとに一定区間でのスコアを計算する関数
-% ver3 : フレーム評価関数に分位数を用いたものを使用
+% ver4 : 
+%   フレーム評価関数に分位数を用いたものを使用
+%   score2の計算に過去deltaT秒の区間で計算するように設定
 %
 % Input
 %   time    : 時間列
@@ -20,7 +22,7 @@ smpls = deltaT/shiftT;
 [~,q1_cent,q2_cent,q3_cent,~] = quantile(cent);
 
 len_time = length(time);
-len_max = len_time-smpls;
+len_max = len_time;
 for i=1:len_time
     % スコア1の計算
     score1_db(i) = detcurve2(db(i),q1_db,q2_db,q3_db);
@@ -29,14 +31,11 @@ for i=1:len_time
     
     % 現在のインデックスを中心として，一定区間をとる
     if i>smpls && i<=len_max
-        tmp_db = db((i-smpls):(i+smpls));
-        tmp_cent = cent((i-smpls):(i+smpls));
+        tmp_db = db((i-smpls+1):i);
+        tmp_cent = cent((i-smpls+1):i);
     elseif i<=smpls && i<=len_max
-        tmp_db = [db(1:i);db((i+1):(i+smpls))];
-        tmp_cent = [cent(1:i);cent((i+1):(i+smpls))];
-    elseif i>smpls && i>len_max
-        tmp_db = [db((i-smpls):(i-1));db(i:len_time)];
-        tmp_cent = [cent((i-smpls):(i-1));cent(i:len_time)];
+        tmp_db = db(1:smpls);
+        tmp_cent = cent(1:smpls);
     else
         tmp_db = db;
         tmp_cent = cent;

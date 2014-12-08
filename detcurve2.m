@@ -5,10 +5,11 @@ function result = detcurve2(x,q1,q2,q3)
 
 % 1/(1+exp(-a*sd))->1ÇÊÇËexp(-a*sd)=0.001Ç∆Ç»ÇÈaÇãÅÇﬂÇÈ
 % -a*sd = log(0.001) = -6.9078
+nearZero = 0.001;
 sd1 = q2-q1;
 sd2 = q3-q2;
-a1 = -log(0.001)/sd1;
-a2 = -log(0.001)/sd2;
+a1 = -log(nearZero)/sd1;
+a2 = -log(nearZero)/sd2;
 
 if x<=q2
     result = 1/(1+exp(-a1*(x-q2+sd1)));
