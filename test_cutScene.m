@@ -1,5 +1,5 @@
 % dataT = readtable('T141105_001.csv');
-windowSize  = 121;
+windowSize  = 31;
 [aT_scene,sf,thsld_score2,thsld_score1] = ...
     cutScene2(T_param.time,T_param.score,windowSize,2);
 len(i) = height(aT_scene);
@@ -17,16 +17,16 @@ for i=1:height(aT_scene)
     plot(tt,tmp);
 end
 
-% data = readtable('C:\Users\Shunji\Desktop\141121_002ƒƒ‚‘‚«.txt',...
-%     'ReadVariableNames',false);
-% 
-% ttt = linspace(0,1760,1760+1);
-% for i=2:length(data.Var3)
-%         label(i-1,:) = [zeros(1,data.Var3(i-1)),...
-%             ones(1,(data.Var3(i)-data.Var3(i-1))),...
-%             zeros(1,(1760-data.Var3(i)+1))];
-% end
-% plot(ttt,label*10);
+data = readtable('C:\Users\Shunji\Desktop\141121_002ƒƒ‚‘‚«.txt',...
+    'ReadVariableNames',false);
+
+ttt = linspace(0,1760,1760+1);
+for i=2:length(data.Var3)
+        label(i-1,:) = [zeros(1,data.Var3(i-1)),...
+            ones(1,(data.Var3(i)-data.Var3(i-1))),...
+            zeros(1,(1760-data.Var3(i)+1))];
+end
+plot(ttt,label*10);
 
 hold off;
 title(['filter-',num2str(windowSize)]);

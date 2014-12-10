@@ -1,4 +1,5 @@
-function [thsld_hi,thsld_low] = detectThreshold(sig,is_removeTrend,is_plot)
+function [thsld_hi,thsld_low] = ...
+    detectThreshold(sig,is_removeTrend,is_plot)
 
 switch nargin
     case 1
@@ -23,16 +24,16 @@ end
 
 % ピークの検出
 [~,locs_peak] = findpeaks(sig,...
-    'MinPeakDistance',100,'MinPeakHeight',q3);
+    'MinPeakDistance',200,'MinPeakHeight',q3);
 
 % 信号の極小値の検出
 sig_inverted = -sig;
 [~,locs_valley] = findpeaks(sig_inverted,...
-    'MinPeakDistance',100,'MinPeakHeight',-q1);
+    'MinPeakDistance',200,'MinPeakHeight',-q1);
 
 % thsld_hi = mean(peak);
-[~,thsld_low,~,~,~] = quantile(sig_orig(locs_valley));
-% thsld_low = mean(sig_orig(locs_valley));
+% [~,thsld_low,~,~,~] = quantile(sig_orig(locs_valley));
+thsld_low = mean(sig_orig(locs_valley));
 % thsld_hi = mean(sig_orig(locs_peak));
 % thsld_hi = min(sig_orig(locs_peak));
 thsld_hi = q1;
@@ -42,9 +43,11 @@ if is_plot == 1
     figure;
     if is_removeTrend == 1
         subplot(3,1,1);
-        plot(t,sig_orig); grid on; title('Original Signal');
+        plot(t,sig_orig); grid on; title('Original Signal'); 
+        xlim([0,length(t)]);
         subplot(3,1,2);
         plot(t,sig); grid on; title('Signal Removed Trend');
+        xlim([0,length(t)]);
         subplot(3,1,3);
         hold on;
         plot(t,sig);
@@ -52,10 +55,10 @@ if is_plot == 1
         plot(locs_valley,sig(locs_valley),'rs','MarkerFaceColor','b');
         hold off;
         grid on; title('Peaks and Valleys');
-        
+        xlim([0,length(t)]);
     else
         subplot(2,1,1);
-        plot(t,sig); grid on; title('Signal');
+        plot(t,sig); grid on; title('Signal'); xlim([0,length(t)]);
         subplot(2,1,2);
         hold on;
         plot(t,sig);
@@ -63,6 +66,7 @@ if is_plot == 1
         plot(locs_valley,sig(locs_valley),'rs','MarkerFaceColor','b');
         hold off;
         grid on; title('Peaks and Valleys');
+        xlim([0,length(t)]);
     end
 end
 end

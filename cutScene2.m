@@ -23,7 +23,7 @@ if filtertype == 1
     score_filtered = filter(coeff,1,score);
 elseif filtertype == 2
     coeff_sgolayfilt = windowSize;
-    coeff_medfilt = 5;
+    coeff_medfilt = 8;
     score_filtered = medSgolayfilt(score,coeff_sgolayfilt,coeff_medfilt);
 end
 

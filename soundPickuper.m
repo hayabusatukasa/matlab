@@ -1,6 +1,6 @@
 clear all;
 %% 前処理
-fname_withoutWAV = '141111_001';
+fname_withoutWAV = '141105_001';
 filename = [fname_withoutWAV,'.WAV'];
 pass = ['\Users\Shunji\Music\RandomPickup\'];
 a_info = audioinfo(filename);
@@ -56,7 +56,7 @@ display(['トータルの計算時間は ',num2str(t_total),' 秒です']);
 clear t_time t_db t_cent t_part t_total s_start s_end;
 
 %% 点数計算
-deltaT_calcScore = 30;
+deltaT_calcScore = 10;
 [~,score] = calcScore4(time,db,cent,deltaT_calcScore,shiftT);
 
 %%  テーブル作成
@@ -64,7 +64,7 @@ T_param = table(time,db,cent,score','VariableNames',...
     {'time','dB','cent','score'});
 
 %% 場面の切り出し
-windowSize = 30;
+windowSize = 31;
 [T_scene,sf,thsld_hi,thsld_low] = ...
     cutScene2(T_param.time,T_param.score,windowSize,1);
 
@@ -81,27 +81,47 @@ for i=1:height(T_scene)
     str_scene(i).time  = T_tmp.time';
 end
 
-%% 切り出した場面ごとの素材部分取り出し
+%% 切り出した場面ごとの素材部分をランダムに取り出す
 num_pickup = 100;
-sec_pickup = 10;    % in sec
+sec_pickup = 30;    % in sec
 sample_pickup = sec_pickup/shiftT;    % in sample
 
 str_random = randomPickup(str_scene,num_pickup,sample_pickup);
 
-%% 選び出された部分から音声データを取得
-if is_getaudio == 1
-    for i=1:length(str_random)
-        if isempty(str_random(i).table) == 0
-            a_tmp = audioread([fname_withoutWAV,'.wav'],...
-                [fs*str_random(i).table.s_start(1)+1,...
-                fs*str_random(i).table.s_end(1)]);
-            a_tmp = (a_tmp(:,1)+a_tmp(:,2))/2;
-            audio(i,:) = a_tmp;
-            s_tmp = floor(str_random(i).table.s_start(1));
-            e_tmp = floor(str_random(i).table.s_end(1));
-            wfname = [pass,'scene',num2str(i),...
-                '_time',num2str(s_tmp),'-',num2str(e_tmp),'.wav'];
-            audiowrite(wfname,a_tmp,fs);
-        end
+%% オーディオ素材を音楽用サンプルに仕上げる
+tau = 0.05;
+bpm = 84;
+bars = 4;
+beat_numer = 4;
+beat_denom = 4;
+audio_sample = [];
+for i=1:length(str_random)
+    if isempty(str_random(i).table) == 0
+        a_tmp = audioread([fname_withoutWAV,'.wav'],...
+            [fs*str_random(i).table.s_start(1)+1,...
+            fs*str_random(i).table.s_end(1)]);
+        a_tmp = (a_tmp(:,1)+a_tmp(:,2))/2;
+        audio_sample(i,:) = audioSampleGenerator...
+            (a_tmp,fs,tau,bpm,bars,beat_numer,beat_denom,0);
     end
 end
+
+%% 音楽用サンプルを書き出す
+if is_getaudio == 1
+    s = size(audio_sample);
+    audio_all = [];
+    for i=1:length(str_random)
+        if isempty(str_random(i).table) == 0
+            % s_tmp = floor(str_random(i).table.s_start(1));
+            % e_tmp = floor(str_random(i).table.s_end(1));
+            wfname = [pass,'scene',num2str(i),'.wav'];
+            % '_time',num2str(s_tmp),'-',num2str(e_tmp),'.wav'];
+            audiowrite(wfname,audio_sample(i,:),fs);
+            
+            audio_all = cat(2,audio_all,audio_sample(i,:));
+        end
+    end
+    wfname = [pass,'scene_all','.wav'];
+    audiowrite(wfname,audio_all,fs);
+end
+

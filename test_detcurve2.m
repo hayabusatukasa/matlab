@@ -1,4 +1,4 @@
-a = T_param.cent(1900:2000);
+a = [1 3 4 5 6 7 8 9 16 20 25 30];
 [min,q1,q2,q3,max] = quantile(a);
 t = linspace(min,max,1000);
 
