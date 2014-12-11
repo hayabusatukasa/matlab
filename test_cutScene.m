@@ -1,7 +1,8 @@
 % dataT = readtable('T141105_001.csv');
 windowSize  = 31;
+coeff_medfilt = 10;
 [aT_scene,sf,thsld_score2,thsld_score1] = ...
-    cutScene2(T_param.time,T_param.score,windowSize,2);
+    cutScene2(T_param.time,T_param.score,windowSize,coeff_medfilt,2,1,0);
 len(i) = height(aT_scene);
 
 t = T_param.time((windowSize+1):end);
@@ -31,4 +32,4 @@ plot(ttt,label*10);
 hold off;
 title(['filter-',num2str(windowSize)]);
 xlim([0,T_param.time(end)]);
-ylim([0,100]);
+ylim([0,max(sf)+5]);

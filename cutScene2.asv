@@ -1,5 +1,5 @@
-function [T_scene,score_filtered,thsld_hi,thsld_low] = cutScene2...
-    (time,score,windowSize,coeff_medfilt,filtertype,is_scenebind,is_plot)
+function [T_scene,score_filtered,thsld_hi,thsld_low] = ...
+    cutScene2(time,score,windowSize,coeff_medfilt,filtertype,is_plot)
 % ver2 è‡’l‚Ì©“®Œˆ’è
 
 switch nargin
@@ -77,9 +77,8 @@ end
 
 % ’Z‚­‚Æ‚è‚·‚¬‚½ê–Ê‚ğ—×Ú‚·‚éê–Ê‚ÆŒ‹‡‚·‚é
 if is_scenebind==1
-    thr_scenelength = 100;
     [scene_start,scene_end,scene_num] = ...
-        sceneBind(scene_start,scene_end,scene_num,thr_scenelength);
+        
 end
 
 % make table

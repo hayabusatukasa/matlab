@@ -65,6 +65,7 @@ T_param = table(time,db,cent,score','VariableNames',...
 
 %% 場面の切り出し
 windowSize = 31;
+coeff_medfilt = 
 [T_scene,sf,thsld_hi,thsld_low] = ...
     cutScene2(T_param.time,T_param.score,windowSize,1);
 
@@ -90,7 +91,7 @@ str_random = randomPickup(str_scene,num_pickup,sample_pickup);
 
 %% オーディオ素材を音楽用サンプルに仕上げる
 tau = 0.05;
-bpm = 84;
+bpm = 85;
 bars = 4;
 beat_numer = 4;
 beat_denom = 4;
@@ -118,8 +119,10 @@ if is_getaudio == 1
             % '_time',num2str(s_tmp),'-',num2str(e_tmp),'.wav'];
             audiowrite(wfname,audio_sample(i,:),fs);
             
-            audio_all = cat(2,audio_all,audio_sample(i,);
+            audio_all = cat(2,audio_all,audio_sample(i,:));
         end
     end
+    wfname = [pass,'scene_all','.wav'];
+    audiowrite(wfname,audio_all,fs);
 end
 

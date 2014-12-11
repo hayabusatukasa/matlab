@@ -1,4 +1,4 @@
-function [score1,score2] = calcScore4(time,db,cent,deltaT,shiftT,type_getscore)
+function [score1,score2] = calcScore4(time,db,cent,deltaT,shiftT)
 % 区間全体でのスコアと，各インデックスごとに一定区間でのスコアを計算する関数
 % ver4 : 
 %   フレーム評価関数に分位数を用いたものを使用
@@ -28,7 +28,7 @@ for i=1:len_time
     % スコア1の計算
     score1_db(i) = detcurve2(db(i),q1_db,q2_db,q3_db);
     score1_cent(i) = detcurve2(cent(i),q1_cent,q2_cent,q3_cent);
-    score1(i) = getscore(score1_db(i),score1_cent(i),type_getscore);
+    score1(i) = getscore(score1_db(i),score1_cent(i));
     
     % 現在のインデックスを中心として，一定区間をとる
     if i>smpls && i<=len_max
@@ -49,6 +49,6 @@ for i=1:len_time
     % スコア2の計算
     score2_db(i) = detcurve2(db(i),q1_tmp_db,q2_tmp_db,q3_tmp_db);
     score2_cent(i)= detcurve2(cent(i),q1_tmp_cent,q2_tmp_cent,q3_tpm_cent);
-    score2(i) = getscore(score2_db(i),score2_cent(i),type_getscore);
+    score2(i) = getscore(score2_db(i),score2_cent(i));
 end
 end

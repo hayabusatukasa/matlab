@@ -1,6 +1,10 @@
 function audio_output = audioSampleGenerator...
     (audio_input,fs,tau,bpm,bars,beat_numer,beat_denom,is_plot)
 % オーディオ素材を音楽用のサンプルに仕上げる関数
+% 14/12/10
+%   audio_outputの長さが正確ではない不具合有．
+%   ピークが正しくとれていないときにエラーメッセージのみ表示して出力は
+%   どうにもしていない．
 %
 % Input:
 %     audio   : オーディオ素材(モノラルのみ)
@@ -21,7 +25,7 @@ bpsample = round(fs*60/bpm*(beat_denom/beat_numer));
 % audio_outputの秒数 > audio_inputの秒数のとき，エラーを返す
 aiSampleLength = length(audio_input);
 if aoSampleLength > aiSampleLength
-    display('too short audio input');
+    warning('too short audio input');
     audio_output = [];
     return
 end
@@ -73,12 +77,12 @@ end
 
 audio_output = [];
 if length(locs_peak)<aoBeats
-    display('in audioSampleGenerator : too short peaks');
+    warning('too short peaks');
     return;
 end
 
 if (locs_valley(aoBeats)-windowSize+bpsample)>length(audio_input)
-    display('in audioSampleGenerator : false to make audio sample');
+    warning('false to make audio sample');
     return;
 end
 

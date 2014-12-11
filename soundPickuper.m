@@ -1,6 +1,6 @@
 clear all;
 %% 前処理
-fname_withoutWAV = '141105_001';
+fname_withoutWAV = '141121_002';
 filename = [fname_withoutWAV,'.WAV'];
 pass = ['\Users\Shunji\Music\RandomPickup\'];
 a_info = audioinfo(filename);
@@ -57,7 +57,8 @@ clear t_time t_db t_cent t_part t_total s_start s_end;
 
 %% 点数計算
 deltaT_calcScore = 10;
-[~,score] = calcScore4(time,db,cent,deltaT_calcScore,shiftT);
+type_getscore = 1;
+[~,score] = calcScore4(time,db,cent,deltaT_calcScore,shiftT,type_getscore);
 
 %%  テーブル作成
 T_param = table(time,db,cent,score','VariableNames',...
@@ -65,8 +66,9 @@ T_param = table(time,db,cent,score','VariableNames',...
 
 %% 場面の切り出し
 windowSize = 31;
+coeff_medfilt = 10;
 [T_scene,sf,thsld_hi,thsld_low] = ...
-    cutScene2(T_param.time,T_param.score,windowSize,1);
+    cutScene2(T_param.time,T_param.score,windowSize,coeff_medfilt,2,1,0);
 
 % plot
 plotScene(T_param,T_scene,sf,thsld_low,thsld_hi,windowSize);
@@ -90,7 +92,7 @@ str_random = randomPickup(str_scene,num_pickup,sample_pickup);
 
 %% オーディオ素材を音楽用サンプルに仕上げる
 tau = 0.05;
-bpm = 84;
+bpm = 85;
 bars = 4;
 beat_numer = 4;
 beat_denom = 4;

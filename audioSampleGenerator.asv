@@ -1,26 +1,31 @@
 function audio_output = audioSampleGenerator...
     (audio_input,fs,tau,bpm,bars,beat_numer,beat_denom,is_plot)
 % オーディオ素材を音楽用のサンプルに仕上げる関数
+% 14/12/10
+%   audio_outputの長さが正確ではない不具合有．
+%   ピークが正しくとれていないときにエラーメッセージのみ表示して出力は
+%   どうにもしていない．
 %
 % Input:
 %     audio   : オーディオ素材(モノラルのみ)
 %     fs      : サンプリング周波数
-%     tau     : エンベロープ取得のフレーム長(in sec)
-%     bpm     : 1分当たりのビート数(Beats per Minute)
+%     tau     : 移動平均フィルタのフレーム長(in sec)
+%     bpm     : 1分あたりのビート数(Beats per Minute)
 %     bars    : 小節数
-%     bpb     : 1小節当たりのビート数(Beats per Bar)
+%     beat_numer : 1小節あたりの拍数
+%     beat_demon : 単位音符
 %     is_plot : ピーク検出結果をプロットするかどうか (0:off else:on)
 
 % audio_outputの秒数を取得
 aoBeats = bars*beat_numer;
 aoSecLength = (60/bpm)*aoBeats;
 aoSampleLength = aoSecLength * fs;
-bpsample = round(fs*60/bpm);
+bpsample = round(fs*60/bpm*(beat_denom/beat_numer));
 
 % audio_outputの秒数 > audio_inputの秒数のとき，エラーを返す
 aiSampleLength = length(audio_input);
 if aoSampleLength > aiSampleLength
-    display('too short audio input');
+    warning('too short audio input');
     audio_output = [];
     return
 end
@@ -51,10 +56,9 @@ for i=1:length(locs_peak)
     thr = mean(env_rev_inverted);
     [~,locs_rev] = findpeaks(env_rev_inverted,'NPeaks',1,'MinPeakHeight',thr);
     
-    % 極小点が取れなかったとき，ピークの0.01秒前を極小点とする
     if isempty(locs_rev) == 0
         locs_valley(i) = locs_peak(i) - locs_rev;
-    else
+    else % 極小点が取れなかったとき，ピークの0.01秒前を極小点とする
         if locs_peak(i) > floor(fs/100)
             locs_valley(i) = locs_peak(i) - floor(fs/100);
         else 
