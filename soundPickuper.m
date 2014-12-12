@@ -1,6 +1,6 @@
 clear all;
 %% ‘Oˆ—
-fname_withoutWAV = '141121_002';
+fname_withoutWAV = '141121_001';
 filename = [fname_withoutWAV,'.WAV'];
 pass = ['\Users\Shunji\Music\RandomPickup\'];
 a_info = audioinfo(filename);
@@ -94,8 +94,8 @@ str_random = randomPickup(str_scene,num_pickup,sample_pickup);
 tau = 0.05;
 bpm = 85;
 bars = 4;
-beat_numer = 4;
-beat_denom = 4;
+beatperbar = 1;
+noteunit = 4;
 audio_sample = [];
 for i=1:length(str_random)
     if isempty(str_random(i).table) == 0
@@ -104,7 +104,7 @@ for i=1:length(str_random)
             fs*str_random(i).table.s_end(1)]);
         a_tmp = (a_tmp(:,1)+a_tmp(:,2))/2;
         audio_sample(i,:) = audioSampleGenerator...
-            (a_tmp,fs,tau,bpm,bars,beat_numer,beat_denom,0);
+            (a_tmp,fs,tau,bpm,bars,beatperbar,noteunit,0);
     end
 end
 

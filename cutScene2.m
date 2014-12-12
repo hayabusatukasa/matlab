@@ -7,26 +7,31 @@ switch nargin
         windowSize = 30;
         coeff_medfilt = 1;
         filtertype = 1;
+        is_scenebind = 1;
         is_plot = 0;
     case 3
         coeff_medfilt = 1;
         filtertype = 1;
+        is_scenebind = 1;
         is_plot = 0;
     case 4
         filtertype = 1;
+        is_scenebind = 1;
         is_plot = 0;
     case 5
+        is_scenebind = 1;
+        is_plot = 0;
+    case 6
         is_plot = 0;
     otherwise
         
 end
         
 % 移動平均フィルタの適用
-% windowSizeごとのフレームの平均をとる
-if filtertype == 1
+if filtertype == 1 % basic moving average
     coeff = ones(1,windowSize)/windowSize;
     score_filtered = filter(coeff,1,score);
-elseif filtertype == 2
+elseif filtertype == 2 % sgolayfilter and medianfilter
     coeff_sgolayfilt = windowSize;
     % coeff_medfilt = 5;
     score_filtered = medSgolayfilt(score,coeff_sgolayfilt,coeff_medfilt);

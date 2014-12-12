@@ -1,5 +1,5 @@
 function audio_output = audioSampleGenerator...
-    (audio_input,fs,tau,bpm,bars,beat_numer,beat_denom,is_plot)
+    (audio_input,fs,tau,bpm,bars,beatperbar,noteunit,is_plot)
 % オーディオ素材を音楽用のサンプルに仕上げる関数
 % 14/12/10
 %   audio_outputの長さが正確ではない不具合有．
@@ -12,15 +12,16 @@ function audio_output = audioSampleGenerator...
 %     tau     : 移動平均フィルタのフレーム長(in sec)
 %     bpm     : 1分あたりのビート数(Beats per Minute)
 %     bars    : 小節数
-%     beat_numer : 1小節あたりの拍数
-%     beat_demon : 単位音符
+%     beatperbar : 1小節あたりの拍数
+%     noteunit   : 単位音符 (noteunit = 2^n)
 %     is_plot : ピーク検出結果をプロットするかどうか (0:off else:on)
 
 % audio_outputの秒数を取得
-aoBeats = bars*beat_numer;
+beat_interval = 60/beatperbar*(4/noteunit);
+aoBeats = bars*beatperbar;
 aoSecLength = (60/bpm)*aoBeats;
 aoSampleLength = aoSecLength * fs;
-bpsample = round(fs*60/bpm*(beat_denom/beat_numer));
+bpsample = round(fs*60/bpm*(noteunit/beatperbar));
 
 % audio_outputの秒数 > audio_inputの秒数のとき，エラーを返す
 aiSampleLength = length(audio_input);
@@ -77,12 +78,12 @@ end
 
 audio_output = [];
 if length(locs_peak)<aoBeats
-    display('in audioSampleGenerator : too short peaks');
+    warning('too short peaks');
     return;
 end
 
 if (locs_valley(aoBeats)-windowSize+bpsample)>length(audio_input)
-    display('in audioSampleGenerator : false to make audio sample');
+    warning('false to make audio sample');
     return;
 end
 
@@ -97,13 +98,14 @@ end
 % 検出したピークのプロット
 if is_plot ~= 0
     t = 1:length(env);
+    t = linspace(0,length(env)/fs,length(env));
     figure;
     hold on;
     plot(t,env);
-    plot(locs_peak,env(locs_peak),'rv','MarkerFaceColor','r');
-    plot(locs_valley,env(locs_valley),'rs','MarkerFaceColor','b');
+    plot(locs_peak/fs,env(locs_peak),'rv','MarkerFaceColor','r');
+    plot(locs_valley/fs,env(locs_valley),'rs','MarkerFaceColor','b');
     hold off;
-    xlim([0 length(env)]);
+    xlim([0 length(env)/fs]);
     title('Audio Peak Picking');
 end
 
