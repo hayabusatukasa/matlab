@@ -1,6 +1,6 @@
 clear all;
 %% 前処理
-fname_withoutWAV = '141121_001';
+fname_withoutWAV = '141121_002';
 filename = [fname_withoutWAV,'.WAV'];
 pass = ['\Users\Shunji\Music\RandomPickup\'];
 a_info = audioinfo(filename);
@@ -37,7 +37,7 @@ for i=0:i_stop
     end
     
     % パラメータ取得し，一時変数に格納
-    [t_time,t_db,t_cent] = soundPickuper_getparameter...
+    [t_time,t_db,t_cent] = getParameter...
         (fname_withoutWAV,s_start,s_end,deltaT,shiftT,fft_size);
     
     % 一時変数を結合

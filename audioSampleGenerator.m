@@ -17,7 +17,7 @@ function audio_output = audioSampleGenerator...
 %     is_plot : ピーク検出結果をプロットするかどうか (0:off else:on)
 
 % audio_outputの秒数を取得
-beat_interval = 60/bpm*(4/noteunit); % [sec]
+beat_interval = 60/bpm*(noteunit/beatperbar); % [sec]
 aoBeats = bars*beatperbar;
 aoSecLength = beat_interval*aoBeats; % [sec]
 aoSampleLength = aoSecLength * fs; % [sample]

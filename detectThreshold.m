@@ -31,11 +31,7 @@ sig_inverted = -sig;
 [~,locs_valley] = findpeaks(sig_inverted,...
     'MinPeakDistance',200,'MinPeakHeight',-q1);
 
-% thsld_hi = mean(peak);
-% [~,thsld_low,~,~,~] = quantile(sig_orig(locs_valley));
 thsld_low = mean(sig_orig(locs_valley));
-% thsld_hi = mean(sig_orig(locs_peak));
-% thsld_hi = min(sig_orig(locs_peak));
 thsld_hi = q1;
 
 if is_plot == 1
