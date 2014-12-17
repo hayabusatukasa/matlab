@@ -1,19 +1,12 @@
-function [thsld_hi,thsld_low] = ...
-    detectThreshold(sig,mpd,is_removeTrend,is_plot)
+function [locs_peak,locs_valley] = ...
+    getPeakValley(sig,mpd,mph_peak,mph_valley,thr,is_removeTrend,is_plot)
 
-switch nargin
-    case 1
-        mpd = 1;
-        is_removeTrend = 0;
-        is_plot = 0;
-    case 2
-        is_removeTrend = 0;
-        is_plot = 0;
-    case 3
-        is_plot = 0;
-    otherwise
-        
-end
+if nargin<2; mpd = 1; end;
+if nargin<3; mph_peak = -Inf; end;
+if nargin<4; mph_valley = -Inf; end;
+if nargin<5; thr = 0; end;
+if nargin<6; is_removeTrend = 0; end;
+if nargin<7; is_plot = 1; end;
 
 sig_orig = sig;
 % 信号のトレンド除去
@@ -23,20 +16,14 @@ if is_removeTrend == 1
     sig = sig - f_y;
 end
 
-% 入力信号の分位数をとってピークの下限とする
-[~,q1,q2,q3,~] = quantile(sig);
-
 % ピークの検出
-[~,locs_peak] = findpeaks(sig,...
-    'MinPeakDistance',mpd,'MinPeakHeight',q3);
+[~,locs_peak] = findpeaks(sig,'MinPeakDistance',mpd,...
+    'MinPeakHeight',mph_peak,'Threshold',thr);
 
 % 信号の極小値の検出
 sig_inverted = -sig;
-[~,locs_valley] = findpeaks(sig_inverted,...
-    'MinPeakDistance',mpd,'MinPeakHeight',-q1);
-
-thsld_low = mean(sig_orig(locs_valley));
-thsld_hi = q1;
+[~,locs_valley] = findpeaks(sig_inverted,'MinPeakDistance',mpd,...
+    'MinPeakHeight',mph_valley,'Threshold',thr);
 
 if is_plot == 1
     t = 1:length(sig);
@@ -55,7 +42,7 @@ if is_plot == 1
         plot(locs_valley,sig(locs_valley),'rs','MarkerFaceColor','b');
         hold off;
         grid on; title('Peaks and Valleys');
-        xlim([0,length(t)]);
+        xlim([1,length(t)]);
     else
         subplot(2,1,1);
         plot(t,sig); grid on; title('Signal'); xlim([0,length(t)]);
@@ -66,7 +53,7 @@ if is_plot == 1
         plot(locs_valley,sig(locs_valley),'rs','MarkerFaceColor','b');
         hold off;
         grid on; title('Peaks and Valleys');
-        xlim([0,length(t)]);
+        xlim([1,length(t)]);
     end
 end
 end

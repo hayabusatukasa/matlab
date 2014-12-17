@@ -14,5 +14,4 @@ end
 hold off;
 title(['filter-',num2str(windowSize)]);
 xlim([0,T_param.time(end)]);
-ylim([0 100]);
 end

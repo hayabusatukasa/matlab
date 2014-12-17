@@ -3,7 +3,7 @@ function [score1,score2] = calcScore4(time,db,cent,deltaT,shiftT,type_getscore)
 % ver4 : 
 %   フレーム評価関数に分位数を用いたものを使用
 %   score2の計算に過去deltaT秒の区間で計算するように設定
-%   getscoreのtypeを2に変更
+%   
 %
 % Input
 %   time    : 時間列

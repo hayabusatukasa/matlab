@@ -37,24 +37,24 @@ elseif filtertype == 2 % sgolayfilter and medianfilter
 end
 
 % 閾値の決定
-[thsld_hi,thsld_low] = detectThreshold(score_filtered,200,0,0);
+[thsld_hi,thsld_low] = detectThreshold(score_filtered,0,0);
 
 % 閾値判定の論理値ベクトルの生成
 score_filtered_upperthsldlow = score_filtered > thsld_low;
 score_filtered_lowerthsldhi =  score_filtered < thsld_hi;
 
 % 場面切り出しループ
-t = time;
+t = time((windowSize+1):end);
 scene_start = 0;
 scene_end = [];
 scene_num = 1;
 len_scene_start = length(scene_start);
 len_scene_end = length(scene_end);
-for i=2:length(t)
-    is_scene_end = score_filtered_upperthsldlow(i-1)...
-                 - score_filtered_upperthsldlow(i); 
-    is_scene_start = score_filtered_lowerthsldhi(i-1)...
-                   - score_filtered_lowerthsldhi(i);
+for i=2:length(t)   
+    is_scene_end = ...
+        score_filtered_upperthsldlow(i-1) - score_filtered_upperthsldlow(i); 
+    is_scene_start = ...
+        score_filtered_lowerthsldhi(i-1) - score_filtered_lowerthsldhi(i);
   
     if is_scene_end == 1
         % 場面の終わりが埋まってないとき埋める
@@ -79,10 +79,9 @@ end
 
 % 短くとりすぎた場面を隣接する場面と結合する
 if is_scenebind==1
-    method = 1;
-    thr = 200;
+    thr_scenelength = 100;
     [scene_start,scene_end,scene_num] = ...
-        sceneBind(scene_start,scene_end,method,thr);
+        sceneBind(scene_start,scene_end,scene_num,thr_scenelength);
 end
 
 % make table

@@ -56,7 +56,7 @@ display(['トータルの計算時間は ',num2str(t_total),' 秒です']);
 clear t_time t_db t_cent t_part t_total s_start s_end;
 
 %% 点数計算
-deltaT_calcScore = 10;
+deltaT_calcScore = 30;
 type_getscore = 1;
 [~,score] = calcScore4(time,db,cent,deltaT_calcScore,shiftT,type_getscore);
 

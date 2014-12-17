@@ -1,8 +1,17 @@
 % dataT = readtable('T141105_001.csv');
 windowSize  = 31;
 coeff_medfilt = 10;
-[aT_scene,sf,thsld_score2,thsld_score1] = ...
-    cutScene2(T_param.time,T_param.score,windowSize,coeff_medfilt,2,1,0);
+is_scenebind = 1;
+type_cutscene = 2;
+switch type_cutscene
+    case 2
+        [aT_scene,sf,thsld_score2,thsld_score1] = ...
+            cutScene2(T_param.time,T_param.score,windowSize,coeff_medfilt,2,is_scenebind,0);
+    case 3
+        [aT_scene,sf,thsld_score2,thsld_score1] = ...
+            cutScene2(T_param.time,T_param.score,windowSize,coeff_medfilt,2,is_scenebind,0);
+    otherwise
+end
 len(i) = height(aT_scene);
 
 t = T_param.time((windowSize+1):end);
@@ -30,6 +39,8 @@ end
 plot(ttt,label*10);
 
 hold off;
-title(['filter-',num2str(windowSize)]);
+title([fname_withoutWAV,' filter-',num2str(windowSize),...
+    ' is\_scenebind=',num2str(is_scenebind)]);
 xlim([0,T_param.time(end)]);
 ylim([0,max(sf)+5]);
+xlabel('Time [s]');

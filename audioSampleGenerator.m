@@ -33,10 +33,7 @@ end
 
 % audio_inputからエンベロープを取得
 windowSize = round(fs*tau);
-a_abs = abs(audio_input);
-coeff = ones(1,windowSize)/windowSize;
-env = filter(coeff,1,a_abs);
-% env = sgolayfilt(a_abs,1,windowSize+1);
+env = movingAverage(abs(audio_input),windowSize);
 
 % エンベロープからピークを取得
 thr = mean(env);
@@ -62,6 +59,7 @@ for i=1:length(locs_peak)
     if isempty(locs_rev) == 0
         locs_valley(i) = locs_peak(i) - locs_rev;
     else % 極小点が取れなかったとき，ピークの0.01秒前を極小点とする
+        warning(['in ',num2str(i),'th peak: not found valley']);
         if locs_peak(i) > floor(fs/100)
             locs_valley(i) = locs_peak(i) - floor(fs/100);
         else 
