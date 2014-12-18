@@ -2,7 +2,7 @@
 windowSize  = 31;
 coeff_medfilt = 10;
 filtertype = 2;
-dsrate = 60;
+dsrate = 50;
 is_scenebind = 1;
 type_cutscene = 3;
 switch type_cutscene

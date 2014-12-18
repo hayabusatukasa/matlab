@@ -1,6 +1,6 @@
 clear all;
 %% ‘Oˆ—
-fname_withoutWAV = '141121_002';
+fname_withoutWAV = '141105_001';
 filename = [fname_withoutWAV,'.WAV'];
 pass = ['\Users\Shunji\Music\RandomPickup\'];
 a_info = audioinfo(filename);

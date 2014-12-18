@@ -1,5 +1,9 @@
 function [locs_peak,locs_valley] = ...
     getPeakValley(sig,mpd,mph_peak,mph_valley,thr,is_removeTrend,is_plot)
+% function [locs_peak,locs_valley] = ...
+%   getPeakValley(sig,mpd,mph_peak,mph_valley,thr,is_removeTrend,is_plot)
+%
+% 与えられた信号からピークと極小値を取得する関数
 
 if nargin<2; mpd = 1; end;
 if nargin<3; mph_peak = -Inf; end;
