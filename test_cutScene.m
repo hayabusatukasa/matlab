@@ -1,7 +1,7 @@
 % dataT = readtable('T141105_001.csv');
 windowSize  = 31;
 coeff_medfilt = 10;
-is_scenebind = 1;
+is_scenebind = 0;
 type_cutscene = 2;
 switch type_cutscene
     case 2
@@ -12,6 +12,8 @@ switch type_cutscene
             cutScene2(T_param.time,T_param.score,windowSize,coeff_medfilt,2,is_scenebind,0);
     otherwise
 end
+aT_scene = sceneBind2(T_param,aT_scene);
+
 len(i) = height(aT_scene);
 
 t = T_param.time((windowSize+1):end);
