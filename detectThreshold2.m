@@ -1,5 +1,5 @@
 function [thsld_hi,thsld_low] = ...
-    detectThreshold(sig,mpd,type,is_removeTrend,is_plot)
+    detectThreshold2(sig,mpd,type,is_removeTrend,is_plot)
 
 if nargin<2; mpd=1; end
 if nargin<3; type=1; end
@@ -14,17 +14,12 @@ if is_removeTrend == 1
     sig = sig - f_y;
 end
 
-% 入力信号の分位数をとってピークの下限とする
-[~,q1,q2,q3,~] = quantile(sig);
-
 % ピークの検出
-[peak,locs_peak] = findpeaks(sig,...
-    'MinPeakDistance',mpd,'MinPeakHeight',q3);
+[~,locs_peak] = findpeaks(sig,'MinPeakDistance',mpd);
 
 % 信号の極小値の検出
 sig_inverted = -sig;
-[valley,locs_valley] = findpeaks(sig_inverted,...
-    'MinPeakDistance',mpd,'MinPeakHeight',-q1);
+[valley,locs_valley] = findpeaks(sig_inverted,'MinPeakDistance',mpd);
 
 switch type
     case 1 % low:極小値の平均 hi:元信号のQ1

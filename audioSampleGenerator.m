@@ -106,6 +106,7 @@ if is_plot ~= 0
     hold off;
     xlim([0 length(env)/fs]);
     title(['Audio Peak Picking tau=',num2str(tau)]);
+    xlabel('Time [s]');
 end
 
 end

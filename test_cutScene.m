@@ -2,7 +2,7 @@
 windowSize  = 31;
 coeff_medfilt = 10;
 filtertype = 2;
-dsrate = 60;
+dsrate = 30;
 is_scenebind = 1;
 type_cutscene = 3;
 switch type_cutscene
@@ -11,6 +11,11 @@ switch type_cutscene
             cutScene2(T_param.time,T_param.score,windowSize,coeff_medfilt,filtertype,is_scenebind,0);
     case 3
         [aT_scene,sf] = cutScene3(T_param,windowSize,coeff_medfilt,filtertype,dsrate,is_scenebind,1);
+        thsld_score1 = 0;
+        thsld_score2 = 30;
+    case 4
+        [aT_scene,sf,thsld_score2,thsld_score1] = ...
+            cutScene4(T_param,windowSize,coeff_medfilt,filtertype,dsrate,is_scenebind,1);
         thsld_score1 = 0;
         thsld_score2 = 30;
     otherwise
@@ -23,8 +28,8 @@ tt = linspace(0,aT_scene.scene_end(end),aT_scene.scene_end(end)*2+1);
 figure;
 plot(t,sf((windowSize+1):end)); 
 hold all;
-plot(t,linspace(thsld_score1,thsld_score1,length(t)),'LineStyle',':');
-plot(t,linspace(thsld_score2,thsld_score2,length(t)),'LineStyle',':');
+% plot(t,linspace(thsld_score1,thsld_score1,length(t)),'LineStyle',':');
+% plot(t,linspace(thsld_score2,thsld_score2,length(t)),'LineStyle',':');
 for i=1:height(aT_scene)
     tmp = (tt>=aT_scene.scene_start(i))&(tt<=aT_scene.scene_end(i));
     tmp = tmp*mean([thsld_score1 thsld_score2]);

@@ -18,14 +18,14 @@ end
 
 % 平滑化された信号のダウンサンプリング
 % dsrate = 120; % ダウンサンプリングレート
-sfds = resample(sf,1,dsrate);
+sfds = downsample(sf,dsrate);
 
 % ダウンサンプリングされた信号の極小値の抽出
 [~,locs_valley_sfds] = getPeakValley(sfds,1,-Inf,-Inf,0,0,0);
 
 % 得られた極小値から元のサンプリングレートでの位置をとり，場面を検出
 usrate = dsrate; %floor(length(sf)/length(sfds)); % アップサンプリングレート
-sfrs = resample(sfds,usrate,1);
+sfrs = interp(sfds,usrate);
 sfrs = sfrs(1:length(sf));
 locs_valley_us = locs_valley_sfds * usrate - usrate;
 scene_start(1) = time(1);
@@ -54,6 +54,8 @@ if is_plot==1
     plot(sfrs);
     stem(locs_valley_us,sfrs(locs_valley_us));
     hold off;
-    title('cutScene3');
+    title(['Moving Average FrameLength= ',num2str(windowSize),' DownsamplingRate = ',num2str(dsrate)]);
+    xlabel('Sample');
+    legend('Moving average','Downsample','Valley');
 end
 end
