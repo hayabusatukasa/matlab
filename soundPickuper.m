@@ -64,14 +64,16 @@ type_getscore = 1;
 T_param = table(time,db,cent,score','VariableNames',...
     {'time','dB','cent','score'});
 
+clear time db cent score;
+
 %% 場面の切り出し
 windowSize = 31;
+dsrate = 10;
 coeff_medfilt = 10;
-[T_scene,sf,thsld_hi,thsld_low] = ...
-    cutScene2(T_param.time,T_param.score,windowSize,coeff_medfilt,2,1,0);
+[T_scene,sf] = cutScene3(T_param,windowSize,coeff_medfilt,2,dsrate,1,0);
 
 % plot
-plotScene(T_param,T_scene,sf,thsld_low,thsld_hi,windowSize);
+plotScene(T_param,T_scene,sf);
 
 %% 切り出した場面ごとの点数計算
 for i=1:height(T_scene)

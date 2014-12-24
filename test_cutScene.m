@@ -2,7 +2,7 @@
 windowSize  = 31;
 coeff_medfilt = 10;
 filtertype = 2;
-dsrate = 30;
+dsrate = 10;
 is_scenebind = 1;
 type_cutscene = 3;
 switch type_cutscene
@@ -10,7 +10,7 @@ switch type_cutscene
         [aT_scene,sf,thsld_score2,thsld_score1] = ...
             cutScene2(T_param.time,T_param.score,windowSize,coeff_medfilt,filtertype,is_scenebind,0);
     case 3
-        [aT_scene,sf] = cutScene3(T_param,windowSize,coeff_medfilt,filtertype,dsrate,is_scenebind,1);
+        [aT_scene,sf,d] = cutScene3(T_param,windowSize,coeff_medfilt,filtertype,dsrate,is_scenebind,1);
         thsld_score1 = 0;
         thsld_score2 = 30;
     case 4
@@ -47,7 +47,7 @@ end
 % plot(ttt,label*10);
 
 hold off;
-title([fname_withoutWAV,' filter-',num2str(windowSize),...
+title([fname_withoutWAV,' filter-',num2str(windowSize),' dsrate-',num2str(dsrate),...
     ' filtertype=',num2str(filtertype),' is\_scenebind=',num2str(is_scenebind)]);
 xlim([0,T_param.time(end)]);
 ylim([0,max(sf)+5]);
