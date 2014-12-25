@@ -2,7 +2,7 @@ clear all;
 %% 前処理
 fname_withoutWAV = '141105_001';
 filename = [fname_withoutWAV,'.WAV'];
-pass = ['\Users\Shunji\Music\RandomPickup\'];
+pass = [];
 a_info = audioinfo(filename);
 fs = a_info.SampleRate;
 dur = a_info.Duration;
@@ -64,11 +64,14 @@ type_getscore = 1;
 T_param = table(time,db,cent,score','VariableNames',...
     {'time','dB','cent','score'});
 
+clear time db cent score;
+
 %% 場面の切り出し
 windowSize = 31;
+dsrate = 30;
 coeff_medfilt = 10;
-[T_scene,sf,thsld_hi,thsld_low] = ...
-    cutScene2(T_param.time,T_param.score,windowSize,coeff_medfilt,2,1,0);
+[T_scene,sf] = ...
+    cutScene3(T_param,windowSize,coeff_medfilt,2,dsrate,1,1);
 
 % plot
 plotScene(T_param,T_scene,sf,thsld_low,thsld_hi,windowSize);
@@ -85,7 +88,7 @@ end
 
 %% 切り出した場面ごとの素材部分をランダムに取り出す
 num_pickup = 100;
-sec_pickup = 30;    % in sec
+sec_pickup = 20;    % in sec
 sample_pickup = sec_pickup/shiftT;    % in sample
 
 str_random = randomPickup(str_scene,num_pickup,sample_pickup);
@@ -99,7 +102,7 @@ noteunit = 4;
 audio_sample = [];
 for i=1:length(str_random)
     if isempty(str_random(i).table) == 0
-        a_tmp = audioread([fname_withoutWAV,'.wav'],...
+        a_tmp = audioread([fname_withoutWAV,'.WAV'],...
             [fs*str_random(i).table.s_start(1)+1,...
             fs*str_random(i).table.s_end(1)]);
         a_tmp = (a_tmp(:,1)+a_tmp(:,2))/2;
@@ -116,7 +119,7 @@ if is_getaudio == 1
         if isempty(str_random(i).table) == 0
             % s_tmp = floor(str_random(i).table.s_start(1));
             % e_tmp = floor(str_random(i).table.s_end(1));
-            wfname = [pass,'scene',num2str(i),'.wav'];
+            wfname = [pass,'scene',num2str(i),'.WAV'];
             % '_time',num2str(s_tmp),'-',num2str(e_tmp),'.wav'];
             audiowrite(wfname,audio_sample(i,:),fs);
             
