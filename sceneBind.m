@@ -1,5 +1,4 @@
-function [scene_start,scene_end,scene_num] = ...
-    sceneBind(scene_start,scene_end,method,thr)
+function T = sceneBind(T_scene,method,thr)
 % [scene_start,scene_end,scene_num] = ...
 %    sceneBind(scene_start,scene_end,scene_num,thr_scenelength)
 %
@@ -23,11 +22,13 @@ if nargin<4
     end
 end
 
+scene_start = T_scene.scene_start;
+scene_end = T_scene.scene_end;
 scene_num = length(scene_start);
 scene_len = scene_end - scene_start;
 
 if scene_len == 1
-    warning('it only has one scene\nreturn with doing nothing');
+    warning('It only has one scene! Return with doing nothing...');
     return;
 end
 
@@ -93,5 +94,8 @@ else
     warning('no such a method');
     return;
 end
+
+% 返値用のテーブル作成
+T = table(scene_start',scene_end','VariableNames',{'scene_start','scene_end'});
 
 end

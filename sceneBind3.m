@@ -1,4 +1,4 @@
-function [T,scene_start,scene_end] = sceneBind3(T_param,T_scene,min_scene_num)
+function [T,d] = sceneBind3(T_param,T_scene,min_scene_num)
 % [T,scene_start,scene_end] = sceneBind2(T_param,T_scene)
 % 各場面のパラメータの近似度から場面結合をする関数
 %
