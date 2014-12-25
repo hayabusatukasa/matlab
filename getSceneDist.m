@@ -1,5 +1,10 @@
 function d = getSceneDist(T_param,T_scene)
 
+if height(T_scene)==1
+    d = Inf;
+    return;
+end
+
 % パラメータを平均0，分散1に標準化
 dB_sdz = standardization(T_param.dB);
 cent_sdz = standardization(T_param.cent);
@@ -22,7 +27,7 @@ end
 
 % 各パラメータの平均と分散の隣接する場面とのユークリッド距離を計算
 for i=1:(length(sceneparam)-1)
-    d(i) = dist(...
+    d(i) = dist_euclidean(...
         [sceneparam(i).dBq1,sceneparam(i).dBq2,sceneparam(i).dBq3,...
         sceneparam(i).centq1,sceneparam(i).centq2,sceneparam(i).centq3],...
         [sceneparam(i+1).dBq1,sceneparam(i+1).dBq2,sceneparam(i+1).dBq3,...

@@ -1,5 +1,5 @@
-function [T_scene,sf,d] = cutScene3...
-    (T_param,windowSize,coeff_medfilt,filtertype,dsrate,is_scenebind,is_plot)
+function [T_scene,sf] = cutScene3...
+    (T_param,windowSize,coeff_medfilt,filtertype,dsrate,is_plot)
 % 
 %
 % ver3 ‹É¬’l‚©‚çê–Ê‚Ì“]Š·“_‚ğŒŸo‚·‚é
@@ -44,13 +44,13 @@ T_scene = table(scene_start',scene_end','VariableNames',...
     {'scene_start','scene_end'});
 
 % ’Z‚­‚Æ‚è‚·‚¬‚½ê–Ê‚ğ—×Ú‚·‚éê–Ê‚ÆŒ‹‡‚·‚é
-if is_scenebind==1
-    [T_scene,d] = sceneBind4(T_param,T_scene,1.0);
-end
-
-if is_scenebind==2
-    [T_scene,d] = sceneBind3(T_param,T_scene,10);
-end
+% if is_scenebind==1
+%     [T_scene,d] = sceneBind4(T_param,T_scene,1.0);
+% end
+% 
+% if is_scenebind==2
+%     [T_scene,d] = sceneBind3(T_param,T_scene,10);
+% end
 
 if is_plot==1
     figure;

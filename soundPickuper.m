@@ -1,6 +1,6 @@
 clear all;
 %% ‘Oˆ—
-fname_withoutWAV = '141105_001';
+fname_withoutWAV = 'ŠÂ‹«‰¹@—[•û‚Ì•—Œi‚Q';
 filename = [fname_withoutWAV,'.WAV'];
 pass = ['\Users\Shunji\Music\RandomPickup\'];
 a_info = audioinfo(filename);
@@ -56,7 +56,7 @@ display(['ƒg[ƒ^ƒ‹‚ÌŒvZŠÔ‚Í ',num2str(t_total),' •b‚Å‚·']);
 clear t_time t_db t_cent t_part t_total s_start s_end;
 
 %% “_”ŒvZ
-deltaT_calcScore = 30;
+deltaT_calcScore = 10;
 type_getscore = 1;
 [~,score] = calcScore4(time,db,cent,deltaT_calcScore,shiftT,type_getscore);
 
@@ -66,11 +66,30 @@ T_param = table(time,db,cent,score','VariableNames',...
 
 clear time db cent score;
 
-%% ê–Ê‚ÌØ‚èo‚µ
+%% ê–Ê‚Ì•ªŠò“_ŒŸo
 windowSize = 31;
 dsrate = 10;
 coeff_medfilt = 10;
-[T_scene,sf] = cutScene3(T_param,windowSize,coeff_medfilt,2,dsrate,1,0);
+filtertype = 1;
+is_plot = 1;
+[T_scene,sf] = cutScene3...
+    (T_param,windowSize,coeff_medfilt,filtertype,dsrate,is_plot);
+
+display([num2str(height(T_scene)),' scenes returned cutScene']);
+
+scd = getSceneDist(T_param,T_scene);
+
+%% ê–Ê‚ÌŒ‹‡
+thr_dist = 1.5;
+T_scene = sceneBind4(T_param,T_scene,thr_dist);
+
+display([num2str(height(T_scene)),' scenes returned sceneBind']);
+
+% ’Z‚·‚¬‚éê–Ê‚ğŒ‹‡
+min_scene_len = 15; % in sec
+T_scene = sceneBindForShortScene(T_scene,min_scene_len);
+
+display([num2str(height(T_scene)),' scenes returned sceneBindForShortScene']);
 
 % plot
 plotScene(T_param,T_scene,sf);
@@ -81,7 +100,7 @@ for i=1:height(T_scene)
     s_end   = T_scene.scene_end(i);
     T_tmp = T_param((T_param.time>=s_start)&(T_param.time<=s_end),:);
     [str_scene(i).score,~] = ...
-        calcScore3(T_tmp.time,T_tmp.dB,T_tmp.cent,deltaT_calcScore,shiftT);
+        calcScore4(T_tmp.time,T_tmp.dB,T_tmp.cent,deltaT_calcScore,shiftT);
     str_scene(i).time  = T_tmp.time';
 end
 

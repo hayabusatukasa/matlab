@@ -22,12 +22,14 @@ while isempty(find(d<thr_dist,1)) == 0
     t_st = T_scene.scene_start;
     t_en = T_scene.scene_end;
     scene_num = length(t_st);
-    i = 1;
+    % i = 1;
     % 距離の短い部分を，開始時間を一時的にNaNにして，結合する場面というラベルにする
-    while d_sort(i) < thr_dist
-        t_en(d_ix(i)) = t_en(d_ix(i)+1);
-        t_st(d_ix(i)+1) = NaN;
-        i=i+1;
+    for i=1:length(d_sort)
+        if d_sort(i) < thr_dist
+            t_en(d_ix(i)) = t_en(d_ix(i)+1);
+            t_st(d_ix(i)+1) = NaN;
+            % i=i+1;
+        end
     end
     
     % 場面の結合
