@@ -1,12 +1,12 @@
 clear all;
 %% 前処理
-fname_withoutWAV = '141105_001';
+fname_withoutWAV = '141111_001';
 filename = [fname_withoutWAV,'.WAV'];
 pass = ['\Users\Shunji\Music\RandomPickup\'];
 a_info = audioinfo(filename);
 fs = a_info.SampleRate;
 dur = a_info.Duration;
-i_stop = ceil(dur/60)-1;
+i_stop = floor(dur/60)-1;
 
 is_getaudio = 1;
 
@@ -27,7 +27,7 @@ for i=0:i_stop
     display(['calculating ',num2str(i),' to ',num2str(i+1)]);
 
     % 60秒ごとにパラメータ取得関数に入るが，末尾でオーバーしないようにする
-    if (dur-i*60)<60
+    if floor(dur-i*60)<=60
         interval = floor(dur)-i*60;
         s_start = i*60;
         s_end = s_start+interval;
@@ -86,13 +86,13 @@ T_scene = sceneBind4(T_param,T_scene,thr_dist);
 display([num2str(height(T_scene)),' scenes returned sceneBind']);
 
 % 短すぎる場面を結合
-min_scene_len = 15; % in sec
+min_scene_len = 10; % in sec
 T_scene = sceneBindForShortScene(T_scene,min_scene_len);
 
 display([num2str(height(T_scene)),' scenes returned sceneBindForShortScene']);
 
 % plot
-plotScene(T_param,T_scene,sf);
+plotScene(T_param,T_scene);
 
 %% 切り出した場面ごとの点数計算
 for i=1:height(T_scene)
