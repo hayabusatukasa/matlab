@@ -1,14 +1,14 @@
 clear all;
 %% 前処理
-fname_withoutWAV = '141111_001';
-filename = [fname_withoutWAV,'.WAV'];
+fname_withoutWAV = 'C:\Users\Shunji\Desktop\NHK場面検出\NHK環境音(22050Hz)';
+filename = [fname_withoutWAV,'.wav'];
 pass = ['\Users\Shunji\Music\RandomPickup\'];
 a_info = audioinfo(filename);
 fs = a_info.SampleRate;
 dur = a_info.Duration;
-i_stop = floor(dur/60)-1;
+i_stop = floor(dur/60);
 
-is_getaudio = 1;
+is_getaudio = 0;
 
 %% フレームごとのパラメータ取得
 time = [];      % 時間
@@ -64,14 +64,14 @@ type_getscore = 1;
 T_param = table(time,db,cent,score','VariableNames',...
     {'time','dB','cent','score'});
 
-clear time db cent score;
+% clear time db cent score;
 
 %% 場面の分岐点検出
-windowSize = 31;
+windowSize = 30;
 dsrate = 10;
 coeff_medfilt = 10;
 filtertype = 1;
-is_plot = 1;
+is_plot = 0;
 [T_scene,sf] = cutScene3...
     (T_param,windowSize,coeff_medfilt,filtertype,dsrate,is_plot);
 
@@ -80,16 +80,27 @@ display([num2str(height(T_scene)),' scenes returned cutScene']);
 scd = getSceneDist(T_param,T_scene);
 
 %% 場面の結合
-thr_dist = 1.5;
-T_scene = sceneBind4(T_param,T_scene,thr_dist);
+thr_dist = 1.0;
+T_scene10 = sceneBind4(T_param,T_scene,thr_dist);
+display([num2str(height(T_scene10)),' scenes returned sceneBind']);
 
-display([num2str(height(T_scene)),' scenes returned sceneBind']);
+thr_dist = 1.5;
+T_scene15 = sceneBind4(T_param,T_scene,thr_dist);
+display([num2str(height(T_scene15)),' scenes returned sceneBind']);
+
+thr_dist = 2.0;
+T_scene20 = sceneBind4(T_param,T_scene,thr_dist);
+display([num2str(height(T_scene20)),' scenes returned sceneBind']);
+
+T_scene = sceneBind4(T_param,T_scene,1.0);
+T_scene = sceneBindForShortScene(T_scene,60);
+% T_scene = sceneBind3(T_param,T_scene,25);
 
 % 短すぎる場面を結合
-min_scene_len = 10; % in sec
-T_scene = sceneBindForShortScene(T_scene,min_scene_len);
-
-display([num2str(height(T_scene)),' scenes returned sceneBindForShortScene']);
+% min_scene_len = 10; % in sec
+% T_scene = sceneBindForShortScene(T_scene,min_scene_len);
+% 
+% display([num2str(height(T_scene)),' scenes returned sceneBindForShortScene']);
 
 % plot
 plotScene(T_param,T_scene);
@@ -100,7 +111,7 @@ for i=1:height(T_scene)
     s_end   = T_scene.scene_end(i);
     T_tmp = T_param((T_param.time>=s_start)&(T_param.time<=s_end),:);
     [str_scene(i).score,~] = ...
-        calcScore4(T_tmp.time,T_tmp.dB,T_tmp.cent,deltaT_calcScore,shiftT);
+        calcScore4(T_tmp.time,T_tmp.dB,T_tmp.cent,deltaT_calcScore,shiftT,1);
     str_scene(i).time  = T_tmp.time';
 end
 
@@ -113,12 +124,13 @@ str_random = randomPickup(str_scene,num_pickup,sample_pickup);
 
 %% オーディオ素材を音楽用サンプルに仕上げる
 tau = 0.05;
-bpm = 85;
+bpm = 96;
 bars = 4;
-beatperbar = 1;
+beatperbar = 4;
 noteunit = 4;
 audio_sample = [];
 for i=1:length(str_random)
+    display(i);
     if isempty(str_random(i).table) == 0
         a_tmp = audioread([fname_withoutWAV,'.wav'],...
             [fs*str_random(i).table.s_start(1)+1,...

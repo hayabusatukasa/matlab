@@ -33,7 +33,7 @@ end
 
 % 各パラメータの平均と分散の隣接する場面とのユークリッド距離を計算
 for i=1:(length(sceneparam)-1)
-    d(i) = dist(...
+    d(i) = dist_euclidean(...
         [sceneparam(i).dBq1,sceneparam(i).dBq2,sceneparam(i).dBq3,...
         sceneparam(i).centq1,sceneparam(i).centq2,sceneparam(i).centq3],...
         [sceneparam(i+1).dBq1,sceneparam(i+1).dBq2,sceneparam(i+1).dBq3,...
@@ -46,12 +46,13 @@ end
 t_st = T_scene.scene_start;
 t_en = T_scene.scene_end;
 scene_num = length(t_st);
-i = 1;
+
 % 距離の短い部分を，開始時間を一時的にNaNにして，結合する場面というラベルにする
-while d_sort(i) < thr_dist
-    t_en(d_ix(i)) = t_en(d_ix(i)+1);
-    t_st(d_ix(i)+1) = NaN;
-    i=i+1;
+for i=1:length(d_sort)
+    if d_sort(i) < thr_dist
+        t_en(d_ix(i)) = t_en(d_ix(i)+1);
+        t_st(d_ix(i)+1) = NaN;
+    end
 end
 
 % 場面の結合
