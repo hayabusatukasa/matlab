@@ -1,4 +1,6 @@
 function d = getSceneDist(T_param,T_scene)
+% d = getSceneDist(T_param,T_scene)
+% Šeê–Ê‚É‚Â‚¢‚ÄCŸ‚Ìê–Ê‚Æ‚Ì‹——£‚ğŒvZ‚·‚éŠÖ”
 
 if height(T_scene)==1
     d = Inf;

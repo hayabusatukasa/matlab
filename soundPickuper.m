@@ -1,6 +1,6 @@
 clear all;
 %% ‘Oˆ—
-fname_withoutWAV = 'C:\Users\Shunji\Desktop\NHKê–ÊŒŸo\NHKŠÂ‹«‰¹(22050Hz)';
+fname_withoutWAV = 'C:\Users\Shunji\Desktop\NHKê–ÊŒŸo\NHKŠÂ‹«‰¹2(22050Hz)';
 filename = [fname_withoutWAV,'.wav'];
 pass = ['\Users\Shunji\Music\RandomPickup\'];
 a_info = audioinfo(filename);
@@ -92,8 +92,8 @@ thr_dist = 2.0;
 T_scene20 = sceneBind4(T_param,T_scene,thr_dist);
 display([num2str(height(T_scene20)),' scenes returned sceneBind']);
 
-T_scene = sceneBind4(T_param,T_scene,1.0);
-T_scene = sceneBindForShortScene(T_scene,60);
+% T_scene = sceneBind4(T_param,T_scene,1.0);
+% T_scene = sceneBindForShortScene(T_scene,60);
 % T_scene = sceneBind3(T_param,T_scene,25);
 
 % ’Z‚·‚¬‚éê–Ê‚ğŒ‹‡
