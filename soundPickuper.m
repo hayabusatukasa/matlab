@@ -1,6 +1,6 @@
 clear all;
 %% ‘Oˆ—
-fname_withoutWAV = 'C:\Users\Shunji\Desktop\NHKê–ÊŒŸo\NHKŠÂ‹«‰¹2(22050Hz)';
+fname_withoutWAV = 'C:\Users\Shunji\Desktop\NHKê–ÊŒŸo\NHKŠÂ‹«‰¹(22050Hz)';
 filename = [fname_withoutWAV,'.wav'];
 pass = ['\Users\Shunji\Music\RandomPickup\'];
 a_info = audioinfo(filename);

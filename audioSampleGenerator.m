@@ -78,12 +78,14 @@ end
 
 audio_output = [];
 if length(locs_peak)<aoBeats
-    warning('too short peaks');
+    warning('Too short peaks. Return input audio.');
+    audio_output = audio_input(1:aoSampleLength);
     return;
 end
 
 if (locs_valley(aoBeats)-windowSize+bisample)>length(audio_input)
-    warning('false to make audio sample');
+    warning('False to make audio sample. Return input audio.');
+    audio_output = audio_input(1:aoSampleLength);
     return;
 end
 

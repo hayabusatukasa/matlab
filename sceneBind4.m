@@ -14,7 +14,7 @@ end
 % 各場面の,隣接場面との距離を計算
 d = getSceneDist(T_param,T_scene);
 
-while isempty(find(d<thr_dist,1)) == 0
+while isempty(find(d<=thr_dist,1)) == 0
     
     % 距離の短い順にソート
     [d_sort,d_ix] = sort(d);
