@@ -1,28 +1,42 @@
-function plotScene(T_param,T_scene,sf)
+function plotScene(T_param,T_scene)
 
-if nargin<3
-    is_plotsf = 0;
-else
-    is_plotsf = 1;
-end
+t = linspace(0,T_scene.scene_end(end),T_scene.scene_end(end)*2+1);
 
-t = T_param.time;
-tt = linspace(0,T_scene.scene_end(end),T_scene.scene_end(end)*2+1);
 figure;
-if is_plotsf==1
-    plot(t,sf); 
-end
+subplot(2,1,1);
 hold all;
-% plot(t,linspace(thsld_low,thsld_low,length(t)),'LineStyle',':');
-% plot(t,linspace(thsld_hi,thsld_hi,length(t)),'LineStyle',':');
 for i=1:height(T_scene)
-    tmp = (tt>=T_scene.scene_start(i))&(tt<=T_scene.scene_end(i));
-    tmp = tmp*20;
-    plot(tt,tmp);
+    tmp = (t>=T_scene.scene_start(i))&(t<=T_scene.scene_end(i));
+    h = plot(t(tmp),T_param.dB(tmp));
+    h = get(h);
+    tmp = tmp*mean(T_param.dB(tmp));
+    plot(t,tmp,'Color',h.Color);
 end
+% stem(T_scene.scene_start,ones(1,length(T_scene.scene_start))*max(T_param.dB*10),...
+%     'LineStyle',':','Color','k');
 hold off;
-% title(['filter-',num2str(windowSize)]);
-xlim([0,T_param.time(end)]);
-ylim([0,100]);
+title(['Loudness scene=', num2str(height(T_scene))]);
+xlim([0,T_scene.scene_end(end)]);
+ylim([min(T_param.dB),max(T_param.dB)]);
+ylabel('Loudness [dB]');
 xlabel('Time [s]');
+
+subplot(2,1,2);
+hold all;
+for i=1:height(T_scene)
+    tmp = (t>=T_scene.scene_start(i))&(t<=T_scene.scene_end(i));
+    h = plot(t(tmp),T_param.cent(tmp));
+    h = get(h);
+    tmp = tmp*mean(T_param.cent(tmp));
+    plot(t,tmp,'Color',h.Color);
+end
+% stem(T_scene.scene_start,ones(1,length(T_scene.scene_start))*max(T_param.cent*10),...
+%     'LineStyle',':','Color','k');
+hold off;
+title(['Sharpness scene=', num2str(height(T_scene))]);
+xlim([0,T_scene.scene_end(end)]);
+ylim([min(T_param.cent),max(T_param.cent)]);
+ylabel('Sharpness');
+xlabel('Time [s]');
+
 end

@@ -1,7 +1,6 @@
-function [T_scene,dw] = sceneBind6(T_param,T_scene,thr_dist,wg_length)
+function [T_scene,dw] = sceneBind6_refactored(T_param,T_scene,thr_dist,wg_length)
 % [T,scene_start,scene_end] = sceneBind6(T_param,T_scene)
 % 各場面のパラメータの近似度から場面結合をする関数
-% ver6 各場面の距離に重みづけをした
 %
 % Input:
 % T_param : パラメータテーブル
@@ -19,11 +18,10 @@ end
 arg_scenelen = height(T_scene);
 scstart = T_scene.scene_start;
 scend = T_scene.scene_end;
+% 重みづけられた距離の取得
+dw = getSceneDist_Weighted(T_param,T_scene,wg_length);
 
 while 1
-    % 重みづけられた距離の取得
-    dw = getSceneDist_Weighted(T_param,T_scene,wg_length);
-    
     % 最も距離の短い場面同士を取得
     dws = size(dw);
     if dws(1)>1
@@ -44,19 +42,30 @@ while 1
         scstart = [scstart(1:n);scstart((n+2):end)];
         scend = [scend(1:n);scend((n+2):end)];
         
-        % テーブルを作成しなおして再度ループ処理
+        % テーブルの更新
         T_scene = table(scstart,scend,...
             'VariableNames',{'scene_start','scene_end'});
         scstart = T_scene.scene_start;
         scend = T_scene.scene_end;
-        % display([num2str(height(T_scene)),' scenes from ',num2str(arg_scenelen),' scenes']);
-        continue;
+        
+        % 重みつき距離の更新
+        if height(T_scene)==1
+            % 場面が1つとなったらループを抜ける
+            break;
+        elseif n==1
+            dwpart = getSceneDist_Weighted(T_param,T_scene(1:2,:),wg_length);
+            dw = [dwpart;dw(3:end,:)];
+        elseif n==height(T_scene)
+            dwpart = getSceneDist_Weighted(T_param,T_scene((end-1):end,:),wg_length);
+            dw = [dw(1:(end-2),:);dwpart];
+        else
+            dwpart = getSceneDist_Weighted(T_param,T_scene((n-1):(n+1),:),wg_length);
+            dw = [dw(1:(n-2),:); dwpart; dw((n+2):end,:)];
+        end
     else
+        % すべての重みつき距離が一定以上ならループを抜ける
         break;   
     end 
 end
-
-% 返値用のテーブル作成
-T_scene = table(scstart,scend,'VariableNames',{'scene_start','scene_end'});
 
 end

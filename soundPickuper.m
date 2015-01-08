@@ -80,17 +80,21 @@ display([num2str(height(T_scene)),' scenes returned cutScene']);
 scd = getSceneDist(T_param,T_scene);
 
 %% 場面の結合
+wg_length = 100;
 thr_dist = 1.0;
-T_scene10 = sceneBind4(T_param,T_scene,thr_dist);
-display([num2str(height(T_scene10)),' scenes returned sceneBind']);
+% T_scene1 = sceneBind4(T_param,T_scene,thr_dist);
+T_scene1 = sceneBind6(T_param,T_scene,thr_dist,wg_length);
+display([num2str(height(T_scene1)),' scenes returned sceneBind']);
 
 thr_dist = 1.5;
-T_scene15 = sceneBind4(T_param,T_scene,thr_dist);
-display([num2str(height(T_scene15)),' scenes returned sceneBind']);
+% T_scene2 = sceneBind4(T_param,T_scene,thr_dist);
+T_scene2 = sceneBind6(T_param,T_scene,thr_dist,wg_length);
+display([num2str(height(T_scene2)),' scenes returned sceneBind']);
 
 thr_dist = 2.0;
-T_scene20 = sceneBind4(T_param,T_scene,thr_dist);
-display([num2str(height(T_scene20)),' scenes returned sceneBind']);
+% T_scene3 = sceneBind4(T_param,T_scene,thr_dist);
+T_scene3 = sceneBind6(T_param,T_scene,thr_dist,wg_length);
+display([num2str(height(T_scene3)),' scenes returned sceneBind']);
 
 % T_scene = sceneBind4(T_param,T_scene,1.0);
 % T_scene = sceneBindForShortScene(T_scene,60);
@@ -103,9 +107,11 @@ display([num2str(height(T_scene20)),' scenes returned sceneBind']);
 % display([num2str(height(T_scene)),' scenes returned sceneBindForShortScene']);
 
 % plot
-plotScene(T_param,T_scene);
+% plotScene(T_param,T_scene);
 
 %% 切り出した場面ごとの点数計算
+T_scene = T_scene2;
+
 for i=1:height(T_scene)
     s_start = T_scene.scene_start(i);
     s_end   = T_scene.scene_end(i);
@@ -124,7 +130,7 @@ str_random = randomPickup(str_scene,num_pickup,sample_pickup);
 
 %% オーディオ素材を音楽用サンプルに仕上げる
 tau = 0.05;
-bpm = 96;
+bpm = 85;
 bars = 4;
 beatperbar = 4;
 noteunit = 4;

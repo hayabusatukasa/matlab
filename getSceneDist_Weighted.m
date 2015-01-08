@@ -3,7 +3,7 @@ function dw = getSceneDist_Weighted(T_param,T_scene,wg_length)
 % 各場面について，次の場面との距離を計算する関数
 
 if height(T_scene)==1
-    dw = Inf;
+    dw = [Inf Inf];
     return;
 end
 
@@ -11,7 +11,7 @@ end
 dB_sdz = standardization(T_param.dB);
 cent_sdz = standardization(T_param.cent);
 
-% 標準化したパラメータの場面ごとの平均と分散を取得
+% 標準化したパラメータの場面ごとの四分位点を取得
 for i=1:height(T_scene)
     index_start = find(T_param.time==T_scene.scene_start(i));
     index_end = find(T_param.time==T_scene.scene_end(i));
