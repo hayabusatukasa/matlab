@@ -16,8 +16,14 @@ function [score1,score2] = calcScore4(time,db,cent,deltaT,shiftT,type_getscore)
 %   score1  : 区間全体でのスコア
 %   score2  : 一定区間でのスコア
 
-% スコア2の平均と標準偏差をとるデータの間隔 in sample
+% データの間隔 in sample
 smpls = deltaT/shiftT;    
+
+if smpls > length(time)
+    score1 = [];
+    score2 = [];
+    return;
+end
 
 [~,q1_db,q2_db,q3_db,~] = quantile(db);
 [~,q1_cent,q2_cent,q3_cent,~] = quantile(cent);

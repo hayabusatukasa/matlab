@@ -1,8 +1,20 @@
 function [T_scene,sf] = cutScene3...
     (T_param,windowSize,coeff_medfilt,filtertype,dsrate,is_plot)
-% 
-%
+% [T_scene,sf] = cutScene3...
+%   (T_param,windowSize,coeff_medfilt,filtertype,dsrate,is_plot)
+% 場面の分岐点を検出し，場面を生成する関数
 % ver3 極小値から場面の転換点を検出する
+% 
+% Input:
+%   T_param : 音響パラメータとスコアのテーブル
+%   windowSize : 移動平均フィルタのタップ数
+%   coeff_medfilt : メディアンフィルターの次数(filtertype=1のときは無視してよい)
+%   filtertype : 用いる移動平均フィルタの種類(1:basic 2:medSgolayfilter)
+%   dsrate : ダウンサンプリングレート
+%   is_plot : 結果をプロットするかどうか
+% Output:
+%   T_scene : 場面のテーブル
+%   sf : フィルタを通過させたスコア
      
 time = T_param.time;
 score = T_param.score;
@@ -42,15 +54,6 @@ end
 % テーブル作成
 T_scene = table(scene_start',scene_end','VariableNames',...
     {'scene_start','scene_end'});
-
-% 短くとりすぎた場面を隣接する場面と結合する
-% if is_scenebind==1
-%     [T_scene,d] = sceneBind4(T_param,T_scene,1.0);
-% end
-% 
-% if is_scenebind==2
-%     [T_scene,d] = sceneBind3(T_param,T_scene,10);
-% end
 
 if is_plot==1
     figure;

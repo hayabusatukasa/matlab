@@ -1,6 +1,6 @@
 clear all;
 %% 前処理
-fname_withoutWAV = '141105_001';
+fname_withoutWAV = '141111_001';
 filename = [fname_withoutWAV,'.wav'];
 pass = ['\Users\Shunji\Music\RandomPickup\'];
 a_info = audioinfo(filename);
@@ -101,15 +101,7 @@ display([num2str(height(T_scene3)),' scenes returned sceneBind']);
 
 %% 切り出した場面ごとの点数計算
 T_scene = T_scene3;
-bpm = 85;
-bars = 4;
-beatperbar = 4;
-noteunit = 4;
-beat_interval = 60/bpm*(noteunit/beatperbar); % [sec]
-aoBeats = bars*beatperbar;
-bisample = round(beat_interval*fs); % [sample]
-aoSampleLength = bisample*aoBeats; % [sample]
-deltaT_calcScore = ceil(beat_interval*aoBeats);
+deltaT_calcScore = 
 
 for i=1:height(T_scene)
     s_start = T_scene.scene_start(i);
@@ -140,10 +132,10 @@ str_random = randomPickup2(str_scene,num_pickup,sample_pickup);
 
 %% オーディオ素材を音楽用サンプルに仕上げる
 tau = 0.05;
-% bpm = 85;
-% bars = 4;
-% beatperbar = 4;
-% noteunit = 4;
+bpm = 85;
+bars = 4;
+beatperbar = 4;
+noteunit = 4;
 audio_sample = [];
 is_plot = 0;
 for i=1:length(str_random)

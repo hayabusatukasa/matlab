@@ -1,6 +1,7 @@
 function [T_scene,dw] = sceneBind6_refactored(T_param,T_scene,thr_dist,wg_length)
 % [T,scene_start,scene_end] = sceneBind6(T_param,T_scene)
 % 各場面のパラメータの近似度から場面結合をする関数
+% ver 6.1 sceneBind6をまともな速度にリファクタリング
 %
 % Input:
 % T_param : パラメータテーブル
@@ -49,13 +50,14 @@ while 1
         scend = T_scene.scene_end;
         
         % 重みつき距離の更新
-        if height(T_scene)==1
+        scenenum = height(T_scene);
+        if scenenum==1
             % 場面が1つとなったらループを抜ける
             break;
         elseif n==1
             dwpart = getSceneDist_Weighted(T_param,T_scene(1:2,:),wg_length);
             dw = [dwpart;dw(3:end,:)];
-        elseif n==height(T_scene)
+        elseif n==scenenum
             dwpart = getSceneDist_Weighted(T_param,T_scene((end-1):end,:),wg_length);
             dw = [dw(1:(end-2),:);dwpart];
         else
