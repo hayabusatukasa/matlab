@@ -3,6 +3,8 @@ function str_random = randomPickup2(str_scene,num_pickup,sample_pickup)
 % sec_pickup = 10;    % in sec
 % sample_pickup = sec_pickup/shiftT;    % in sample
 
+
+
 % 場面ごとに素材をランダムにピックアップし，それぞれの点数を出す
 rng('shuffle');
 for i=1:length(str_scene)
@@ -11,7 +13,7 @@ for i=1:length(str_scene)
     % range_sample = length(str_scene(i).time)-sample_pickup;
     
     l = length(str_scene(i).score);
-    if l >= num_pickup
+    if l >= sample_pickup
         n = num_pickup;
         range_sample = l-sample_pickup;
         

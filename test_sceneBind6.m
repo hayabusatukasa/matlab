@@ -3,17 +3,15 @@ is_plot1 = 0;
 is_plot2 = 1;
 
 %% ver1
-% scene_start = [0 180 295 446 623 694 840 1017 1166 1293 1384 1564 1741 ...
-%     1861 2039 2218 2396 2590 2740 2854 3016 3137 3316 3496 3670];
-% scene_end =  [180 295 446 623 694 840 1017 1166 1293 1384 1564 1741 ...
-%     1861 2039 2218 2396 2590 2740 2854 3016 3137 3316 3496 3670 3764];
-% scenenum = 25;
-% 
-% T_scene_trueposition = table(scene_start',scene_end',...
-%     'VariableNames',{'scene_start','scene_end'});
-% d_trueposition = [0; getSceneDist(T_param,T_scene_trueposition)];
-% 
-% T_scenenum25 = sceneBind3(T_param,T_scene,scenenum);
+scene_start = [0 180 295 446 623 694 840 1017 1166 1293 1384 1564 1741 ...
+    1861 2039 2218 2396 2590 2740 2854 3016 3137 3316 3496 3670];
+scene_end =  [180 295 446 623 694 840 1017 1166 1293 1384 1564 1741 ...
+    1861 2039 2218 2396 2590 2740 2854 3016 3137 3316 3496 3670 3764];
+scenenum = 25;
+
+T_scene_trueposition = table(scene_start',scene_end',...
+    'VariableNames',{'scene_start','scene_end'});
+d_trueposition = [0; getSceneDist(T_param,T_scene_trueposition)];
 
 t = linspace(0,T_scene.scene_end(end),T_scene.scene_end(end)*2+1);
 

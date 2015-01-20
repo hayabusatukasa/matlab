@@ -36,7 +36,7 @@ msp = mirspectrum(mfr,'Length',fft_size,'Min',fft_min,'Max',fft_max);
 % 等価騒音レベルの取得
 fr = mirgetdata(mfr)';
 mean_fr = mean(fr.^2,2);
-L = 10*log10(mean_fr/P0^2);
+L = 10*log10(mean_fr/(P0^2));
 
 % スペクトル重心の取得
 sp = mirgetdata(msp)';

@@ -1,8 +1,8 @@
-% clear all;
+clear all;
 %% 前処理
-fname_withoutWAV = 'C:\Users\Shunji\Desktop\NHK場面検出\NHK環境音(22050Hz)';
+fname_withoutWAV = '141121_001';
 filename = [fname_withoutWAV,'.wav'];
-% pass = ['\Users\Shunji\Music\RandomPickup\'];
+pass = ['\Users\Shunji\Music\RandomPickup\'];
 a_info = audioinfo(filename);
 fs = a_info.SampleRate;
 dur = a_info.Duration;
@@ -81,28 +81,31 @@ scd = getSceneDist(T_param,T_scene);
 
 %% 場面の結合
 wg_length = 100;
-% thr_dist = 1.0;
-% T_scene1 = sceneBind6_refactored(T_param,T_scene,thr_dist,wg_length);
-% display([num2str(height(T_scene1)),' scenes returned sceneBind']);
+thr_dist = 1.0;
+% T_scene1 = sceneBind4(T_param,T_scene,thr_dist);
+T_scene1 = sceneBind6_refactored(T_param,T_scene,thr_dist,wg_length);
+display([num2str(height(T_scene1)),' scenes returned sceneBind']);
 
 thr_dist = 1.5;
+% T_scene2 = sceneBind4(T_param,T_scene,thr_dist);
 T_scene2 = sceneBind6_refactored(T_param,T_scene,thr_dist,wg_length);
 display([num2str(height(T_scene2)),' scenes returned sceneBind']);
 
-% thr_dist = 2.0;
-% T_scene3 = sceneBind6_refactored(T_param,T_scene,thr_dist,wg_length);
-% display([num2str(height(T_scene3)),' scenes returned sceneBind']);
+thr_dist = 2.0;
+% T_scene3 = sceneBind4(T_param,T_scene,thr_dist);
+T_scene3 = sceneBind6_refactored(T_param,T_scene,thr_dist,wg_length);
+display([num2str(height(T_scene3)),' scenes returned sceneBind']);
 
 % plot
-% plotScene(T_param,T_scene1);
-% plotScene(T_param,T_scene2);
-% plotScene(T_param,T_scene3);
+plotScene(T_param,T_scene1);
+plotScene(T_param,T_scene2);
+plotScene(T_param,T_scene3);
 
 
 
 %% 切り出した場面ごとの点数計算
-T_scene = T_scene2;
-% bpm = 120;
+T_scene = T_scene1;
+bpm = 120;
 bars = 4;
 beatperbar = 8;
 noteunit = 4;
@@ -252,7 +255,6 @@ for i=1:length(audio_sample(:,1))
 end
 
 %% 猫と戯れる
-
 if fs==44100
     if bpm==100
         neko1 = audioread('neko1_bpm100.wav');
@@ -263,64 +265,24 @@ if fs==44100
         neko2 = audioread('neko2_bpm120.wav');
         neko3 = audioread('neko3_bpm120.wav');
     end
-    
-elseif fs==22050
-    if bpm==100
-        neko1 = audioread('neko1_bpm100_22050Hz.wav');
-        neko2 = audioread('neko2_bpm100_22050Hz.wav');
-        neko3 = audioread('neko3_bpm100_22050Hz.wav');
-    elseif bpm==120
-        neko1 = audioread('neko1_bpm120_22050Hz.wav');
-        neko2 = audioread('neko2_bpm120_22050Hz.wav');
-        neko3 = audioread('neko3_bpm120_22050Hz.wav');
-    end
 end
-neko = [];
-neko(1,:) = neko1;
-neko(2,:) = neko2;
-neko(3,:) = neko3;
 
-audio_random_fade05_neko = [];
-audio_random_fade08_neko = [];
-audio_random_fade10_neko = [];
-audio_fade05_neko = [];
-audio_fade08_neko = [];
-audio_fade10_neko = [];
-
-neko_2bar = length(neko(1,:))-aoSampleLength;
-for n=1:3
-    for i=1:length(audio_sample(:,1))
-        audio_random_fade05_neko(i,:) = [neko(n,1:neko_2bar),...
-            audio_random_fade05(i,:) + neko(n,(neko_2bar+1):end)];
-        audio_random_fade08_neko(i,:) = [neko(n,1:neko_2bar),...
-            audio_random_fade08(i,:) + neko(n,(neko_2bar+1):end)];
-        audio_random_fade10_neko(i,:) = [neko(n,1:neko_2bar),...
-            audio_random_fade10(i,:) + neko(n,(neko_2bar+1):end)];
-        
-        audio_fade05_neko(i,:) = [neko(n,1:neko_2bar),...
-            audio_fade05(i,:) + neko(n,(neko_2bar+1):end)];
-        audio_fade08_neko(i,:) = [neko(n,1:neko_2bar),...
-            audio_fade08(i,:) + neko(n,(neko_2bar+1):end)];
-        audio_fade10_neko(i,:) = [neko(n,1:neko_2bar),...
-            audio_fade10(i,:) + neko(n,(neko_2bar+1):end)];
-    end
-
-% audio_fade05 = audio_fade05_neko;
-% audio_fade08 = audio_fade08_neko;
-% audio_fade10 = audio_fade10_neko;
-% audio_random_fade05 = audio_random_fade05_neko;
-% audio_random_fade08 = audio_random_fade08_neko;
-% audio_random_fade10 = audio_random_fade10_neko;
+neko_4bar = length(neko)-aoSampleLength;
+neko_2bar = length(neko)-neko_2bar;
+for i=1:length(audio_sample(:,1))
+    audio_random_fade05_neko(i,:) = [neko(1:neko_2bar)',...
+        audio_random_fade05(i,:) + neko((neko_4bar+1):end)'];
+    audio_random_fade08_neko(i,:) = [neko(1:neko_2bar)'...
+        audio_random_fade05(i,:) + neko((neko_4bar+1):end)';
+    audio_random_fade10_neko(i,:) = [neko(1:neko_2bar)'...
+        audio_random_fade05(i,:) + neko((neko_4bar+1):end)';
+end
 
 %% 音楽用サンプルを書き出す
 if is_getaudio == 1
     s = size(audio_sample);
-    for i=1:length(audio_sample(:,1))
+    for i=1:length(str_random)
         if SNratio(i) >=0.2
-            pass = ['\Users\Shunji\Music\RandomPickup\','bpm',num2str(bpm),'\',...
-               fname_withoutWAV,'\neko',num2str(n),'\'];
-            %pass = ['\Users\Shunji\Music\RandomPickup\neko',num2str(n),'\'];
-            
             wfname1 = [pass,'sample_scene',num2str(i),'_bpm',num2str(bpm),...
                 '_bars',num2str(bars),'_bpb',num2str(beatperbar),'.wav'];
             wfname2 = [pass,'sample_fade05_scene',num2str(i),'_bpm',num2str(bpm),...
@@ -339,16 +301,15 @@ if is_getaudio == 1
                 num2str(str_scene(i).time(1)),'to',num2str(str_scene(i).time(end)),...
                 '_section',num2str(str_random(i).table.s_start(1)),...
                 'to',num2str(str_random(i).table.s_end(1)),'.wav'];
-            audiowrite(wfname1,audio_fade10_neko(i,:),fs);
-            audiowrite(wfname2,audio_fade05_neko(i,:),fs);
-            audiowrite(wfname3,audio_random_fade10_neko(i,:),fs);
-            audiowrite(wfname4,audio_random_fade05_neko(i,:),fs);
-            audiowrite(wfname5,audio_fade08_neko(i,:),fs);
-            audiowrite(wfname6,audio_random_fade08_neko(i,:),fs);
+            audiowrite(wfname1,audio_fade10(i,:),fs);
+            audiowrite(wfname2,audio_fade05(i,:),fs);
+            audiowrite(wfname3,audio_random_fade10(i,:),fs);
+            audiowrite(wfname4,audio_random_fade05(i,:),fs);
+            audiowrite(wfname5,audio_fade08(i,:),fs);
+            audiowrite(wfname6,audio_random_fade08(i,:),fs);
         end
     end
 %     wfname3 = [pass,'scene_all','.wav'];
 %     audiowrite(wfname3,audio_all,fs);
 end
 
-end

@@ -6,7 +6,9 @@ function audio_output = audioSampleGenerator_refactored...
 %   ピークが正しくとれていないときにエラーメッセージのみ表示して出力は
 %   どうにもしていない．
 % 15/01/09
-%   
+%   どうにかした．
+%   ピークが十分に取れていないときはaudio_inputの冒頭audio_output
+%   の長さの分をaudio_outputとして返す．
 %
 % Input:
 %     audio   : オーディオ素材(モノラルのみ)
@@ -81,26 +83,47 @@ i_start = 1;
 
 audio_output = [];
 if length(locs_peak)<aoBeats
-    warning('Too short peaks. Return input audio.');
-    audio_output = audio_input(1:aoSampleLength);
-    return;
-end
+    display('Too short peaks.');
+    if beatperbar>1
+        display('Restart sample generate in beatperbar/2.');
+        audio_output = audioSampleGenerator_refactored...
+            (audio_input,fs,tau,bpm,bars,beatperbar/2,noteunit,0);
+        if length(audio_output) > aoSampleLength
+            audio_output = audio_output(1:aoSampleLength);
+        elseif length(audio_output) < aoSampleLength
+            audio_output = [audio_output; ...
+                zeros(aoSampleLength-length(audio_output),1)];
+        end
+    else
+        display('Return input audio.');
+        audio_output = audio_input(1:aoSampleLength);
+    end
+    audio_plot = audio_output;
+    s_start_plot = 1;
+    s_end_plot = aoSampleLength;
+    aoBeats = 1;
+    
+    
 
-if (locs_valley(aoBeats)+bisample-1)>length(audio_input)
+elseif (locs_valley(aoBeats)+bisample-1)>length(audio_input)
     warning('False to make audio sample. Return input audio.');
     audio_output = audio_input(1:aoSampleLength);
-    return;
-end
-
-% 検出したピークを起点にして，ビートごとに音をつなぎ合わせる
-for i=i_start:aoBeats
-    s_start = locs_valley(i);%-windowSize;
-    s_end = s_start + bisample - 1;
-    a_tmp = audio_input(s_start:s_end);
-    audio_output = cat(1,audio_output,a_tmp);
-    audio_plot(i,:) = a_tmp;
-    s_start_plot(i) = s_start;
-    s_end_plot(i) = s_end;
+    audio_plot = audio_output;
+    s_start_plot = 1;
+    s_end_plot = aoSampleLength;
+    aoBeats = 1;
+    
+else
+    % 検出したピークを起点にして，ビートごとに音をつなぎ合わせる
+    for i=i_start:aoBeats
+        s_start = locs_valley(i)+round(windowSize/2);
+        s_end = s_start + bisample - 1;
+        a_tmp = audio_input(s_start:s_end);
+        audio_output = cat(1,audio_output,a_tmp);
+        audio_plot(i,:) = a_tmp;
+        s_start_plot(i) = s_start;
+        s_end_plot(i) = s_end;
+    end
 end
 
 if is_plot ~= 0
@@ -109,8 +132,12 @@ if is_plot ~= 0
     t = linspace(0,length(audio_input)/fs,length(audio_input));
     hold on;
     plot(t,audio_input,'Color','b');
-    for i=1:aoBeats
-        plot(t(s_start_plot(i):s_end_plot(i)),audio_plot(i,:),'Color','r');
+    if aoBeats==1
+        plot(t(s_start_plot:s_end_plot),audio_plot,'Color','r');
+    else
+        for i=1:aoBeats
+            plot(t(s_start_plot(i):s_end_plot(i)),audio_plot(i,:),'Color','r');
+        end
     end
     hold off;
     title('Audio used for generating');
