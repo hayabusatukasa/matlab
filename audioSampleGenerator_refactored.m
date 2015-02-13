@@ -72,6 +72,7 @@ for i=1:length(locs_peak)
         end
     end
 end
+% locs_valley = locs_valley(2:end);
 
 i_start = 1;
 % j = 1;
@@ -102,8 +103,6 @@ if length(locs_peak)<aoBeats
     s_start_plot = 1;
     s_end_plot = aoSampleLength;
     aoBeats = 1;
-    
-    
 
 elseif (locs_valley(aoBeats)+bisample-1)>length(audio_input)
     warning('False to make audio sample. Return input audio.');
@@ -127,8 +126,8 @@ else
 end
 
 if is_plot ~= 0
-    figure;
-    subplot(2,1,1);
+    %figure;
+    subplot(3,1,1);
     t = linspace(0,length(audio_input)/fs,length(audio_input));
     hold on;
     plot(t,audio_input,'Color','b');
@@ -140,23 +139,47 @@ if is_plot ~= 0
         end
     end
     hold off;
-    title('Audio used for generating');
-    xlim([0 length(env)/fs]);
+    %title('Audio used for generating');
+    xlim([0 length(audio_input)/fs]);
     xlabel('Time [s]');
     ylabel('Amplitude');
-
+    %legend('audio unused for sample','audio used for sample');
     
+    %figure;
+    subplot(3,1,2);
     t = linspace(0,length(env)/fs,length(env));
-    subplot(2,1,2);
-    plot(t,abs(audio_input)*0.25,'Color','b');
+    plot(t,abs(audio_input)*max(env),'Color','b');
     hold on;
     plot(t,env,'Color','g');
     plot(locs_peak/fs,env(locs_peak),'rv','MarkerFaceColor','r');
     plot(locs_valley/fs,env(locs_valley),'rs','MarkerFaceColor','b');
     hold off;
-    xlim([0 length(env)/fs]);
-    title(['Audio Peak Picking tau=',num2str(tau)]);
+    xlim([0 length(audio_input)/fs]);
+    %title(['Audio Peak Picking tau=',num2str(tau)]);
     xlabel('Time [s]');
+
+    %figure;
+    subplot(3,1,3);
+    t = linspace(0,aoBeats,length(audio_output));
+    plot(t,audio_output,'Color','r');
+    grid on;
+    set(gca,'XTick',[0:1:aoBeats]);
+    %set(gca,'YTick',[-1.0:0.5:1.0]);
+    %title('Generated Audio Sample');
+    xlabel('Beat');
+    ylabel('Amplitude');
+    xlim([0,aoBeats]);
+    %ylim([-1.0,1.0]);
+    
+%     figure;
+%     % subplot(3,1,1);
+%     t = linspace(0,length(audio_input)/fs,length(audio_input));
+%     hold on;
+%     plot(t,audio_input,'Color','b');
+%     %title('Audio used for generating');
+%     xlim([0 20]);
+%     xlabel('Time [s]');
+%     ylabel('Amplitude');
 end
 
 end

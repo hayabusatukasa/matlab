@@ -56,13 +56,18 @@ T_scene = table(scene_start',scene_end','VariableNames',...
     {'scene_start','scene_end'});
 
 if is_plot==1
+    t = linspace(time(1),time(end),length(time));
+    
     figure;
-    plot(sf); hold all;
-    plot(sfrs);
-    stem(locs_valley_us,sfrs(locs_valley_us));
+    plot(t,score.*(mean(sfrs)/max(score))); 
+    hold all;
+    plot(t,sfrs,'Color','g');
+    stem(t(locs_valley_us),sfrs(locs_valley_us),'Color','r');
     hold off;
-    title(['Moving Average FrameLength= ',num2str(windowSize),' DownsamplingRate = ',num2str(dsrate)]);
-    xlabel('Sample');
-    legend('Moving average','Downsample','Valley');
+    title(['MovingAverageFrameLength= ',num2str(windowSize),' DownsamplingRate = ',num2str(dsrate)]);
+    xlabel('Time [s]');
+    ylabel('Score');
+    %legend('Moving average','Downsample','Valley');
+    xlim([t(1),t(end)]);
 end
 end

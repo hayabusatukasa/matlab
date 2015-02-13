@@ -1,4 +1,4 @@
-function plotScene(T_param,T_scene)
+function plotScene2(T_param,T_scene)
 
 t = linspace(0,T_scene.scene_end(end),T_scene.scene_end(end)*2+1);
 
@@ -6,14 +6,13 @@ dB = T_param.dB;
 cent = log(T_param.cent);
 
 figure;
-subplot(2,1,1);
 hold all;
 for i=1:height(T_scene)
     tmp = (t>=T_scene.scene_start(i))&(t<=T_scene.scene_end(i));
-    h = plot(t(tmp),dB(tmp));
+    h = plot(t(tmp),dB(tmp),'Color','k');
     h = get(h);
     tmp = tmp*mean(dB(tmp));
-    plot(t,tmp,'Color',h.Color);
+    %plot(t,tmp,'Color',h.Color);
 end
 % stem(T_scene.scene_start,ones(1,length(T_scene.scene_start))*max(dB*10),...
 %     'LineStyle',':','Color','k');
@@ -24,7 +23,7 @@ ylim([min(dB),max(dB)]);
 ylabel('Loudness [dB]');
 xlabel('Time [s]');
 
-subplot(2,1,2);
+figure;
 hold all;
 for i=1:height(T_scene)
     tmp = (t>=T_scene.scene_start(i))&(t<=T_scene.scene_end(i));

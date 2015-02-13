@@ -1,6 +1,6 @@
 %%
-is_plot1 = 0;
-is_plot2 = 1;
+is_plot1 = 1;
+is_plot2 = 0;
 
 %% ver1
 scene_start = [0 180 295 446 623 694 840 1017 1166 1293 1384 1564 1741 ...
@@ -15,9 +15,6 @@ d_trueposition = [0; getSceneDist(T_param,T_scene_trueposition)];
 
 t = linspace(0,T_scene.scene_end(end),T_scene.scene_end(end)*2+1);
 
-scenelen_scenetp = T_scene_trueposition.scene_end - T_scene_trueposition.scene_start;
-Q_tp = getQuantile(scenelen_scenetp);
-
 %%
 wg_length = 100;
 thr_dist = 1.0;
@@ -26,8 +23,6 @@ display(['calculating T_scene1']);
 T_scene1 = sceneBind6_refactored(T_param,T_scene,thr_dist,wg_length);
 t_part = cputime - t_part;
 display(['ŒvŽZŽžŠÔ‚Í ',num2str(t_part),' •b‚Å‚·']);
-scenelen_scene1 = T_scene1.scene_end - T_scene1.scene_start;
-Q_1 = getQuantile(scenelen_scene1);
 
 thr_dist = 1.5;
 t_part = cputime;
@@ -35,8 +30,6 @@ display(['calculating T_scene2']);
 T_scene2 = sceneBind6_refactored(T_param,T_scene,thr_dist,wg_length);
 t_part = cputime - t_part;
 display(['ŒvŽZŽžŠÔ‚Í ',num2str(t_part),' •b‚Å‚·']);
-scenelen_scene2 = T_scene2.scene_end - T_scene2.scene_start;
-Q_2 = getQuantile(scenelen_scene2);
 
 thr_dist = 2.0;
 t_part = cputime;
@@ -44,15 +37,13 @@ display(['calculating T_scene3']);
 T_scene3 = sceneBind6_refactored(T_param,T_scene,thr_dist,wg_length);
 t_part = cputime - t_part;
 display(['ŒvŽZŽžŠÔ‚Í ',num2str(t_part),' •b‚Å‚·']);
-scenelen_scene3 = T_scene3.scene_end - T_scene3.scene_start;
-Q_3 = getQuantile(scenelen_scene3);
 
 %%
 dB = T_param.dB;
 cent = log(T_param.cent);
 figure;
 % db
-subplot(3,2,1);
+subplot(3,1,1);
 hold all;
 for i=1:height(T_scene1)
     tmp = (t>=T_scene1.scene_start(i))&(t<=T_scene1.scene_end(i));
@@ -62,8 +53,10 @@ for i=1:height(T_scene1)
     plot(t,tmp,'Color',h.Color);
 end
 if is_plot1==1
-stem(scene_start,ones(1,length(scene_start))*max(dB*10),...
-    'LineStyle',':','Color','k');
+h = stem(scene_start,ones(1,length(scene_start))*max(dB),...
+    'LineStyle',':','Color','k','MarkerSize',0.1);
+hleg = legend(h,'True position');
+set(hleg,'Location','SouthEast');
 end
 if is_plot2==1
 stem(T_scene1.scene_start,ones(1,length(T_scene1.scene_start))*max(dB*10),...
@@ -76,33 +69,8 @@ ylim([min(dB),max(dB)]);
 ylabel('Loudness [dB]');
 xlabel('Time [s]');
 
-% centroid
-subplot(3,2,2);
-hold all;
-for i=1:height(T_scene1)
-    tmp = (t>=T_scene1.scene_start(i))&(t<=T_scene1.scene_end(i));
-    h = plot(t(tmp),cent(tmp));
-    h = get(h);
-    tmp = tmp*mean(cent(tmp));
-    plot(t,tmp,'Color',h.Color);
-end
-if is_plot1==1
-stem(scene_start,ones(1,length(scene_start))*max(cent*10),...
-    'LineStyle',':','Color','k');
-end
-if is_plot2==1
-stem(T_scene1.scene_start,ones(1,length(T_scene1.scene_start))*max(cent*10),...
-    'LineStyle',':','Color','k');
-end
-hold off;
-title(['Sharpness dist=1.0 scene=', num2str(height(T_scene1))]);
-xlim([0,T_scene.scene_end(end)]);
-ylim([min(cent),max(cent)]);
-ylabel('Sharpness');
-xlabel('Time [s]');
-
 %%
-subplot(3,2,3);
+subplot(3,1,2);
 hold all;
 for i=1:height(T_scene2)
     tmp = (t>=T_scene2.scene_start(i))&(t<=T_scene2.scene_end(i));
@@ -112,8 +80,10 @@ for i=1:height(T_scene2)
     plot(t,tmp,'Color',h.Color);
 end
 if is_plot1==1
-stem(scene_start,ones(1,length(scene_start))*max(dB*10),...
-    'LineStyle',':','Color','k');
+h = stem(scene_start,ones(1,length(scene_start))*max(dB),...
+    'LineStyle',':','Color','k','MarkerSize',0.1);
+hleg = legend(h,'True position');
+set(hleg,'Location','SouthEast');
 end
 if is_plot2==1
 stem(T_scene2.scene_start,ones(1,length(T_scene2.scene_start))*max(dB*10),...
@@ -126,33 +96,8 @@ ylim([min(dB),max(dB)]);
 ylabel('Loudness [dB]');
 xlabel('Time [s]');
 
-% centroid
-subplot(3,2,4);
-hold all;
-for i=1:height(T_scene2)
-    tmp = (t>=T_scene2.scene_start(i))&(t<=T_scene2.scene_end(i));
-    h = plot(t(tmp),cent(tmp));
-    h = get(h);
-    tmp = tmp*mean(cent(tmp));
-    plot(t,tmp,'Color',h.Color);
-end
-if is_plot1==1
-stem(scene_start,ones(1,length(scene_start))*max(cent*10),...
-    'LineStyle',':','Color','k');
-end
-if is_plot2==1
-stem(T_scene2.scene_start,ones(1,length(T_scene2.scene_start))*max(cent*10),...
-    'LineStyle',':','Color','k');
-end
-hold off;
-title(['Sharpness dist=1.5 scene=', num2str(height(T_scene2))]);
-xlim([0,T_scene.scene_end(end)]);
-ylim([min(cent),max(cent)]);
-ylabel('Sharpness');
-xlabel('Time [s]');
-
 %%
-subplot(3,2,5);
+subplot(3,1,3);
 hold all;
 for i=1:height(T_scene3)
     tmp = (t>=T_scene3.scene_start(i))&(t<=T_scene3.scene_end(i));
@@ -162,8 +107,10 @@ for i=1:height(T_scene3)
     plot(t,tmp,'Color',h.Color);
 end
 if is_plot1==1
-stem(scene_start,ones(1,length(scene_start))*max(dB*10),...
-    'LineStyle',':','Color','k');
+h = stem(scene_start,ones(1,length(scene_start))*max(dB),...
+    'LineStyle',':','Color','k','MarkerSize',0.1);
+hleg = legend(h,'True position');
+set(hleg,'Location','SouthEast');
 end
 if is_plot2==1
 stem(T_scene3.scene_start,ones(1,length(T_scene3.scene_start))*max(dB*10),...
@@ -176,27 +123,4 @@ ylim([min(dB),max(dB)]);
 ylabel('Loudness [dB]');
 xlabel('Time [s]');
 
-% centroid
-subplot(3,2,6);
-hold all;
-for i=1:height(T_scene3)
-    tmp = (t>=T_scene3.scene_start(i))&(t<=T_scene3.scene_end(i));
-    h = plot(t(tmp),cent(tmp));
-    h = get(h);
-    tmp = tmp*mean(cent(tmp));
-    plot(t,tmp,'Color',h.Color);
-end
-if is_plot1==1
-stem(scene_start,ones(1,length(scene_start))*max(cent*10),...
-    'LineStyle',':','Color','k');
-end
-if is_plot2==1
-stem(T_scene3.scene_start,ones(1,length(T_scene3.scene_start))*max(cent*10),...
-    'LineStyle',':','Color','k');
-end
-hold off;
-title(['Sharpness dist=2.0 scene=', num2str(height(T_scene3))]);
-xlim([0,T_scene.scene_end(end)]);
-ylim([min(cent),max(cent)]);
-ylabel('Sharpness');
-xlabel('Time [s]');
+legend();

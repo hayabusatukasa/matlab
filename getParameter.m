@@ -37,6 +37,8 @@ msp = mirspectrum(mfr,'Length',fft_size,'Min',fft_min,'Max',fft_max);
 fr = mirgetdata(mfr)';
 mean_fr = mean(fr.^2,2);
 L = 10*log10(mean_fr/(P0^2));
+% mean_fr = mean(abs(fr),2);
+% L = 10*log10(mean_fr/P0);
 
 % スペクトル重心の取得
 sp = mirgetdata(msp)';
