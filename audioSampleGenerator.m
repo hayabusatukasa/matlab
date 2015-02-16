@@ -1,12 +1,8 @@
 function audio_output = audioSampleGenerator...
     (audio_input,fs,tau,bpm,bars,beatperbar,noteunit,is_plot)
-% オーディオ素材を音楽用のサンプルに仕上げる関数
-% 14/12/10
-%   audio_outputの長さが正確ではない不具合有．
-%   ピークが正しくとれていないときにエラーメッセージのみ表示して出力は
-%   どうにもしていない．
-% 15/01/09
-%   
+% audio_output = audioSampleGenerator...
+%   (audio_input,fs,tau,bpm,bars,beatperbar,noteunit,is_plot)
+% 音楽素材作成関数
 %
 % Input:
 %     audio   : オーディオ素材(モノラルのみ)
@@ -17,20 +13,20 @@ function audio_output = audioSampleGenerator...
 %     beatperbar : 1小節あたりの拍数
 %     noteunit   : 単位音符 (noteunit = 2^n)
 %     is_plot : ピーク検出結果をプロットするかどうか (0:off else:on)
+%
+% Output:
+%     audio_output : 音楽素材
 
 % audio_outputの秒数を取得
 beat_interval = 60/bpm*(noteunit/beatperbar); % [sec]
 aoBeats = bars*beatperbar;
-aoSecLength = beat_interval*aoBeats; % [sec]
-aoSampleLength = aoSecLength * fs; % [sample]
 bisample = round(beat_interval*fs); % [sample]
+aoSampleLength = bisample*aoBeats; % [sample]
 
 % audio_outputの秒数 > audio_inputの秒数のとき，エラーを返す
 aiSampleLength = length(audio_input);
 if aoSampleLength > aiSampleLength
     error('too short audio input');
-    audio_output = [];
-    return
 end
 
 % audio_inputからエンベロープを取得
@@ -68,11 +64,12 @@ for i=1:length(locs_peak)
         warning(['in ',num2str(i),'th peak: not found valley']);
         if locs_peak(i) > floor(fs/100)
             locs_valley(i) = locs_peak(i) - floor(fs/100);
-        else
+        else 
             locs_valley(i) = 1;
         end
     end
 end
+% locs_valley = locs_valley(2:end);
 
 i_start = 1;
 % j = 1;
@@ -84,39 +81,92 @@ i_start = 1;
 
 audio_output = [];
 if length(locs_peak)<aoBeats
-    warning('Too short peaks. Return input audio.');
-    audio_output = audio_input(1:aoSampleLength);
-    return;
-end
+    display('Too short peaks.');
+    if beatperbar>1
+        display('Restart sample generate in beatperbar/2.');
+        audio_output = audioSampleGenerator_refactored...
+            (audio_input,fs,tau,bpm,bars,beatperbar/2,noteunit,0);
+        if length(audio_output) > aoSampleLength
+            audio_output = audio_output(1:aoSampleLength);
+        elseif length(audio_output) < aoSampleLength
+            audio_output = [audio_output; ...
+                zeros(aoSampleLength-length(audio_output),1)];
+        end
+    else
+        display('Return input audio.');
+        audio_output = audio_input(1:aoSampleLength);
+    end
+    audio_plot = audio_output;
+    s_start_plot = 1;
+    s_end_plot = aoSampleLength;
+    aoBeats = 1;
 
-if (locs_valley(aoBeats)-windowSize+bisample)>length(audio_input)
+elseif (locs_valley(aoBeats)+bisample-1)>length(audio_input)
     warning('False to make audio sample. Return input audio.');
     audio_output = audio_input(1:aoSampleLength);
-    return;
-end
-
-% 検出したピークを起点にして，ビートごとに音をつなぎ合わせる
-for i=i_start:aoBeats
-    s_start = locs_valley(i);%-windowSize;
-    s_end = s_start + bisample;
-    a_tmp = audio_input((s_start+1):s_end);
-    audio_output = cat(1,audio_output,a_tmp);
-end
-
-% 検出したピークのプロット
-if is_plot ~= 0
-    t = linspace(0,length(env)/fs,length(env));
-    figure;
+    audio_plot = audio_output;
+    s_start_plot = 1;
+    s_end_plot = aoSampleLength;
+    aoBeats = 1;
     
+else
+    % 検出したピークを起点にして，ビートごとに音をつなぎ合わせる
+    for i=i_start:aoBeats
+        s_start = locs_valley(i)+round(windowSize/2);
+        s_end = s_start + bisample - 1;
+        a_tmp = audio_input(s_start:s_end);
+        audio_output = cat(1,audio_output,a_tmp);
+        audio_plot(i,:) = a_tmp;
+        s_start_plot(i) = s_start;
+        s_end_plot(i) = s_end;
+    end
+end
+
+if is_plot ~= 0
+    %figure;
+    subplot(3,1,1);
+    t = linspace(0,length(audio_input)/fs,length(audio_input));
+    hold on;
+    plot(t,audio_input,'Color','b');
+    if aoBeats==1
+        plot(t(s_start_plot:s_end_plot),audio_plot,'Color','r');
+    else
+        for i=1:aoBeats
+            plot(t(s_start_plot(i):s_end_plot(i)),audio_plot(i,:),'Color','r');
+        end
+    end
+    hold off;
+    title('Audio used for generating');
+    xlim([0 length(audio_input)/fs]);
+    xlabel('Time [s]');
+    ylabel('Amplitude');
+    %legend('audio unused for sample','audio used for sample');
+    
+    %figure;
+    subplot(3,1,2);
+    t = linspace(0,length(env)/fs,length(env));
+    plot(t,abs(audio_input)*max(env),'Color','b');
     hold on;
     plot(t,env,'Color','g');
     plot(locs_peak/fs,env(locs_peak),'rv','MarkerFaceColor','r');
     plot(locs_valley/fs,env(locs_valley),'rs','MarkerFaceColor','b');
     hold off;
-    xlim([0 length(env)/fs]);
+    xlim([0 length(audio_input)/fs]);
     title(['Audio Peak Picking tau=',num2str(tau)]);
     xlabel('Time [s]');
+
+    %figure;
+    subplot(3,1,3);
+    t = linspace(0,aoBeats,length(audio_output));
+    plot(t,audio_output,'Color','r');
+    grid on;
+    set(gca,'XTick',[0:1:aoBeats]);
+    %set(gca,'YTick',[-1.0:0.5:1.0]);
+    title('Generated Audio Sample');
+    xlabel('Beat');
+    ylabel('Amplitude');
+    xlim([0,aoBeats]);
+    %ylim([-1.0,1.0]);
 end
 
 end
-

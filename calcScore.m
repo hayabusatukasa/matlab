@@ -1,60 +1,64 @@
-function [score1,score2] = calcScore(time,db,cent,shiftT)
-% スコア2の平均と標準偏差をとるデータの間隔 in sample
-sec = 30/shiftT;    
+function [score1,score2] = calcScore(vec_time,vec_param,feedback,type_getscore)
+% [score1,score2] = calcScore(vec_time,vec_param,feedback,type_getscore)
+% 区間全体でのスコアと，各インデックスごとに一定区間でのスコアを計算する関数
+% Input:
+% 	vec_time	: 時間ベクトル
+% 	vec_param	: 特徴ベクトル
+% 	feedback	: 一定区間のサンプル長
+% 	type_getscore: スコアの計算方式(default=1)
+% 
+% Output:
+%	score1 		: 区間全体でのスコア列
+%	score2		: 一定区間でのスコア列
 
-% 一定以上のdBを持つインデックスのみを取り出す
-P0 = 2e-5;
-thsld_amp = 0;                       % threshold in amplitude
-thsld_db = 10*log10(thsld_amp^2/P0^2);  % in db
-upperthsld = (db>=thsld_db);
-db_upperthsld = db(upperthsld);
-cent_upperthsld = cent(upperthsld);
+if nargin<4
+	type_getscore=1;
+end
 
-% スコア1の計算に用いる，全体を見たときの平均と標準偏差
-me_db = median(db_upperthsld);
-sd_db = std(db_upperthsld);
-me_cent = median(cent_upperthsld);
-sd_cent = std(cent_upperthsld);
+if feedback > length(vec_time)
+    score1 = [];
+    score2 = [];
+    return;
+end
 
-len = length(time);
-for i=1:len
+[~,pvdim] = size(vec_param); % 特徴ベクトルの次元数
+
+% パラメータ全体での四分位点を取得
+for i=1:pvdim
+    [~,q1_pv(i),q2_pv(i),q3_pv(i),~] = quantile(vec_param(:,i));
+end
+
+len_time = length(vec_time);
+len_max = len_time;
+for i=1:len_time
     % スコア1の計算
-    score1_db(i) = detcurve(db(i),me_db,sd_db);
-    score1_cent(i) = detcurve(cent(i),me_cent,sd_cent);
-    score1(i) = getscore(score1_db(i),score1_cent(i));
+    for j=1:pvdim
+        t_score1(j) = detcurve2(vec_param(i,j),q1_pv(j),q2_pv(j),q3_pv(j));
+    end
+    score1(i) = getScoreResult(t_score1);
     
     % 現在のインデックスを中心として，一定区間をとる
-    if i>sec && i<=(len-sec)
-        tmp_db = db((i-sec):(i+sec));
-        tmp_cent = cent((i-sec):(i+sec));
-    elseif i<=sec && i<=(len-sec)
-        tmp_db = [db(1:i);db((i+1):(i+sec))];
-        tmp_cent = [cent(1:i);cent((i+1):(i+sec))];
-    elseif i>sec && i>(len-sec)
-        tmp_db = [db((i-sec):(i-1));db(i:len)];
-        tmp_cent = [cent((i-sec):(i-1));cent(i:len)];
+    if i>feedback && i<=len_max
+        tmp_pv = vec_param((i-feedback+1):i,:);
+    elseif i<=feedback && i<=len_max
+        tmp_pv = vec_param(1:feedback,:);
+    else
+        tmp_pv = vec_param;
     end
     
-    tmp_upperthsld = (tmp_db>=thsld_db);
-    tmp_db = tmp_db(tmp_upperthsld);
-    tmp_cent = tmp_cent(tmp_upperthsld);
-    
-    % 一定区間の中央値，標準偏差をとる
-    if isempty(tmp_db)
-        me_tmp_db = 0;
-        sd_tmp_db = 0;
-        me_tmp_cent = 0;
-        sd_tmp_cent = 0;
-    else
-        me_tmp_db = median(tmp_db);
-        sd_tmp_db = std(tmp_db);
-        me_tmp_cent = median(tmp_cent);
-        sd_tmp_cent = std(tmp_cent);
+    % 一定区間のパラメータの四分位点をとる
+    for j=1:pvdim
+        [~,q1_tmp_pv(j),q2_tmp_pv(j),q3_tmp_pv(j),~] = quantile(tmp_pv(:,j));
     end
     
     % スコア2の計算
-    score2_db(i) = detcurve(db(i),me_tmp_db,sd_tmp_db);
-    score2_cent(i)= detcurve(cent(i),me_tmp_cent,sd_tmp_cent);
-    score2(i) = getscore(score2_db(i),score2_cent(i));
+    for j=1:pvdim
+        t_score2(j) = detcurve2(vec_param(i,j),q1_tmp_pv(j),q2_tmp_pv(j),q3_tmp_pv(j));
+    end
+    score2(i) = getScoreResult(t_score2);
 end
+
+score1 = score1';
+score2 = score2';
+
 end

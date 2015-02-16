@@ -1,9 +1,14 @@
 function str_random = randomPickup2(str_scene,num_pickup,sample_pickup)
-% num_pickup = 100;
-% sec_pickup = 10;    % in sec
-% sample_pickup = sec_pickup/shiftT;    % in sample
-
-
+% str_random = randomPickup2(str_scene,num_pickup,sample_pickup)
+% 場面ごとの部分的箇所の取得
+%
+% Input:
+%	str_scene	: 場面ごとのスコア
+%	num_pickup	: ランダムな箇所を取り出す個数
+%	sample_pickup: 取り出す箇所のサンプル長
+%
+% Output:
+%	str_random	: ランダムに取り出した箇所
 
 % 場面ごとに素材をランダムにピックアップし，それぞれの点数を出す
 rng('shuffle');

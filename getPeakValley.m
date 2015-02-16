@@ -4,6 +4,19 @@ function [locs_peak,locs_valley] = ...
 %   getPeakValley(sig,mpd,mph_peak,mph_valley,thr,is_removeTrend,is_plot)
 %
 % 与えられた信号からピークと極小値を取得する関数
+% 
+% Input:
+%	sig			: 入力信号
+% 	mpd			: MinPeakDistance(default=1)
+% 	mph_peak	: MinPeakHeight(for peak, default=-Inf)
+% 	mph_valley	: MinPeakHeight(for valley, default=-Inf)
+% 	thr			: Threshold(default=0)
+% 	is_removeTrend: トレンド除去するかどうか(0 or 1, default=0)
+% 	is_plot		: プロットするかどうか(0 or 1, default=1)
+% 
+% Output:
+%	locs_peak	: ピーク位置
+%	locs_valley : 極小点位置
 
 if nargin<2; mpd = 1; end;
 if nargin<3; mph_peak = -Inf; end;

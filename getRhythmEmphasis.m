@@ -1,5 +1,21 @@
 function [a_reno,a_rehi,a_relow] = ...
     getRhythmEmphasis(audio_input,fs,bpm,bars,beatperbar,noteunit)
+% [a_reno,a_rehi,a_relow] = ...
+%   getRhythmEmphasis(audio_input,fs,bpm,bars,beatperbar,noteunit)
+% リズム強調の適用関数
+%
+% Input:
+%	audio_input	: 入力音声
+%	fs			: サンプリング周波数
+%	bpm			: Beat Per Minute
+%	bars		: 小節数
+%	beatperbar	: 1小節当たりの拍数
+%	noteunit	: 1小節当たりの拍数基準
+%
+% Output:
+%	a_reno		: リズム強調無しの音声
+%	a_rehi		: リズム強調（強）の音声
+%	a_relow		: リズム強調（弱）の音声
 
 beat_interval = 60/bpm*(noteunit/beatperbar); % [sec]
 aoBeats = bars*beatperbar;
@@ -44,8 +60,8 @@ for i=1:aoBeats
     fade08 = [fade08,adsr];
 end
 
-a_reno = audio_input.*fade10';
-a_rehi = audio_input.*fade05';
-a_relow = audio_input.*fade08';
+a_reno = audio_input.*fade10;
+a_rehi = audio_input.*fade05;
+a_relow = audio_input.*fade08;
 
 end
