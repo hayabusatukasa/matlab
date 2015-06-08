@@ -77,6 +77,12 @@ switch paramtype
             Leq(:,n) = 10*log10(fb(:,n)/I0);
         end
         vec_param = Leq;
+        
+%--- MFCC ---
+    case 3
+        mfr = mirframe(ma,'Length',deltaT,'s','Hop',shiftT/deltaT);
+        mmfcc = mirmfcc(mfr);
+        vec_param = mirgetdata(mmfcc)';
 end
         
 %% ŽžŠÔŽ²‚ÌŽæ“¾

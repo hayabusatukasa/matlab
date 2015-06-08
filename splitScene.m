@@ -1,6 +1,6 @@
-function T_scene = splitScene(T_param,num_split)
+function T_scene = splitScene(vec_time,num_split)
 
-time = T_param.time;
+time = vec_time;
 len_time = length(time);
 
 scene_start = [];

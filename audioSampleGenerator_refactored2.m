@@ -1,4 +1,4 @@
-function audio_output = audioSampleGenerator_refactored...
+function audio_output = audioSampleGenerator_refactored2...
     (audio_input,fs,tau,bpm,bars,beatperbar,noteunit,is_plot)
 % オーディオ素材を音楽用のサンプルに仕上げる関数
 % 14/12/10
@@ -41,40 +41,29 @@ envrs = interp(envds,dsrate);
 env = envrs(1:length(env));
 
 % エンベロープからピークを取得
-thr = mean(env);
-%[~,~,~,thr,~] =  quantile(env);
-[~,locs_peak] = findpeaks...
-    (env,'MinPeakDistance',bisample,'MinPeakHeight',thr);
+%thr = mean(env);
+[~,q1_env,q2_env,q3_env,~] =  quantile(env);
+[locs_peak,locs_valley] = getPeakValley...
+    (env,round(length(env)/(aoBeats)),q3_env,-q1_env,0,0,1);
 
-% ピークごとに直前の極小点を取得
-for i=1:length(locs_peak)      
-    % 今見ているピークから1つ前のピークまでの区間のエンベロープを取得し，
-    % それを反転させる
-    if i>1
-        locs = (locs_peak(i-1)+1):locs_peak(i);
-    else
-        locs = 1:locs_peak(i);
-    end
-    env_rev = flipud(env(locs));
-    
-    % 反転させたエンベロープから，ピークの直前で1つだけ極小点を取得
-    env_rev_inverted = (-env_rev);
-    thr = mean(env_rev_inverted);
-    [~,locs_rev] = findpeaks(env_rev_inverted,...
-        'NPeaks',1,'MinPeakHeight',thr,'Threshold',0);
-    
-    if isempty(locs_rev) == 0
-        locs_valley(i) = locs_peak(i) - locs_rev;
-    else % 極小点が取れなかったとき，ピークの0.01秒前を極小点とする
-        warning(['in ',num2str(i),'th peak: not found valley']);
-        if locs_peak(i) > floor(fs/100)
-            locs_valley(i) = locs_peak(i) - floor(fs/100);
-        else 
-            locs_valley(i) = 1;
+num_valley = length(locs_valley);
+num_peak = length(locs_peak);
+for i=1:(num_valley-1)
+    % 極小点間のサンプル長を取得
+    len_valleyDistance(i) = locs_valley(i+1) - locs_valley(i);
+
+    % 極小点間のピーク数を取得
+    num_peaks_valleyDistance(i) = 0;
+    for j=1:num_peak
+        if locs_peak(j)>locs_valley(i) && locs_peak(j)<locs_valley(i+1)
+            num_peaks_valleyDistance(i) = num_peaks_valleyDistance(i) + 1;
         end
     end
 end
-% locs_valley = locs_valley(2:end);
+
+% 極小点間の長さを拍単位で取得
+len_valleyDistance_inBeat = len_valleyDistance / bisample;
+lvDiB_floor = floor(len_valleyDistance_inBeat);
 
 i_start = 1;
 % j = 1;
@@ -89,7 +78,7 @@ if length(locs_peak)<aoBeats
     display('Too short peaks.');
     if beatperbar>1
         display('Restart sample generate in beatperbar/2.');
-        audio_output = audioSampleGenerator_refactored...
+        audio_output = audioSampleGenerator_refactored2...
             (audio_input,fs,tau,bpm,bars,beatperbar/2,noteunit,0);
         if length(audio_output) > aoSampleLength
             audio_output = audio_output(1:aoSampleLength);

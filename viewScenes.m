@@ -1,14 +1,20 @@
-function viewScenes(vec_param,T_scene)
+function viewScenes(vec_param,T_scene,pvdim)
 % viewScenes(vec_param,T_scene)
 % 場面をプロットする関数
 %
 % Input:
 %	vec_param	: 特徴ベクトル
 %	T_scene		: 場面テーブル
+%   pvdim       : プロットするパラメータの数
 
 t = linspace(0,T_scene.scene_end(end),length(vec_param));
 
-[~,pvdim] = size(vec_param);
+[~,t_pvdim] = size(vec_param);
+if nargin<3
+    pvdim = t_pvdim;
+elseif pvdim>t_pvdim || pvdim==0
+    pvdim = t_pvdim;
+end
 
 if pvdim>4
     subp_h = 4;

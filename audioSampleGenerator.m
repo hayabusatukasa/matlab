@@ -123,7 +123,7 @@ else
 end
 
 if is_plot ~= 0
-    %figure;
+    figure;
     subplot(3,1,1);
     t = linspace(0,length(audio_input)/fs,length(audio_input));
     hold on;
