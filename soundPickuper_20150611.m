@@ -1,17 +1,18 @@
 clear all;
 %% 前処理
-fname_withoutWAV = '141121_001';
+fname_withoutWAV = 'I:\VOICE\FOLDER05\141024_001';
 music_fname = 'pop.00050.au';
 filename = [fname_withoutWAV,'.wav'];
 pass = [];
 a_info = audioinfo(filename);
-fs = a_info.SampleRate;
+fs_input = a_info.SampleRate;
 dur = a_info.Duration;
 
 is_getaudio = 1;
 
 %% 音楽データのテンポ推定
-ma = miraudio(music_fname);
+[audio_music, fs_music] = audioread(music_fname);
+ma = miraudio(audio_music,fs_music);
 mtmp = mirtempo(ma);
 tempo = mirgetdata(mtmp);
 
@@ -54,16 +55,6 @@ viewScenes(vec_param,T_scene,length(vec_param(1,:)));
 T_scene_minsec = time2min_sec(T_scene);
 
 %% 切り出した場面ごとの点数計算
-bpm = tempo;
-bars = 1;
-beatperbar = 4;
-noteunit = 4;
-beat_interval = 60/bpm*(noteunit/beatperbar); % [sec]
-aoBeats = bars*beatperbar;
-bisample = round(beat_interval*fs); % [sample]
-aoSampleLength = bisample*aoBeats; % [sample]
-deltaT_calcScore = ceil(beat_interval*aoBeats);
-feedback_calcScore = deltaT_calcScore/shiftT;
 
 clear str_scene str_tmp
 
@@ -73,8 +64,7 @@ for i=1:height(T_scene)
     %T_tmp = T_param((T_param.time>=s_start)&(T_param.time<=s_end),:);
     tv_tmp = vec_time((vec_time>=s_start)&(vec_time<=s_end));
     pv_tmp = vec_param((vec_time>=s_start)&(vec_time<=s_end),:);
-    [str_scene(i).score,~] = ...
-        calcScore(tv_tmp,pv_tmp,feedback_calcScore,1);
+    [str_scene(i).score,~] = calcScore(tv_tmp,pv_tmp,10,1);
     str_scene(i).time  = tv_tmp;
 end
 
@@ -109,11 +99,6 @@ end
 str_random = str_tmp;
 
 %% オーディオ素材を音楽用サンプルに仕上げる
-tau = 0.02;
-% bpm = 85;
-% bars = 4;
-% beatperbar = 8;
-% noteunit = 4;
 n = 0;
 for i=1:length(str_random)
     if isempty(str_random(i).table) == 0
@@ -121,68 +106,33 @@ for i=1:length(str_random)
     end
 end
 
-audio_sample = zeros(n,aoSampleLength);
-audio_random = zeros(n,fs*sec_pickup);
+ao_sec = 10;
+amSampleLength = fs_music*ao_sec;
+aoSampleLength = fs_input*ao_sec;
+num_parts = floor(length(audio_music)/amSampleLength);
+audio_sample = zeros(num_parts,aoSampleLength);
 is_plot = 0;
 
-for i=1:length(str_random)
+for i=1:num_parts
     if isempty(str_random(i).table) == 0
         display(['Scene ',num2str(i),' audio sample generating...']);
         a_tmp = audioread([fname_withoutWAV,'.wav'],...
-            [fs*str_random(i).table.s_start(1)+1,...
-            fs*str_random(i).table.s_end(1)]);
-        a_tmp = (a_tmp(:,1)+a_tmp(:,2))/2;
-        audio_sample(i,:) = audioSampleGenerator3...
-            (a_tmp,fs,tau,bpm,bars,beatperbar,noteunit,is_plot);
-        audio_random(i,:) = a_tmp';
+            [fs_input*str_random(i).table.s_start(1)+1,...
+            fs_input*str_random(i).table.s_end(1)]);
+        a_tmp = a_tmp(:,1);
+        index = (i-1)*amSampleLength;
+        audio_sample(i,:) = audioSampleGenerator5...
+            (audio_music((index+1):(index+amSampleLength)),...
+            fs_music,a_tmp,fs_input,ao_sec,0.1,1.0,1.5);
     else
         display(['Scene ',num2str(i),' audio sample generate skipped']);
     end
 end
 
-%% オーディオのノーマライズ
-% norm_power = 0.5;
-% audio_sample_norm = [];
-% SNratio = [];
-% for i=1:length(audio_sample(:,1))
-%     audio_sample_norm(i,:) = ...
-%         norm_power.*audio_sample(i,:)./max(abs(audio_sample(i,:)));
-%     SNratio(i) = max(abs(audio_sample(i,:)))/norm_power;
-% end
-% 
-% audio_sample = audio_sample_norm;
-
-%% サンプルのリズム強調
-audio_noRE = zeros(length(audio_sample(:,1)),length(audio_sample(1,:)));
-audio_hiRE = zeros(length(audio_sample(:,1)),length(audio_sample(1,:)));
-audio_loRE = zeros(length(audio_sample(:,1)),length(audio_sample(1,:)));
-for i=1:length(audio_sample(:,1))
-    [audio_noRE(i,:),audio_hiRE(i,:),audio_loRE(i,:)] = ...
-        getRhythmEmphasis(audio_sample(i,:),fs,bpm,bars,beatperbar,noteunit);
-end
-
 %% 音楽用サンプルを書き出す
-% if is_getaudio == 1
-%     s = size(audio_sample);
-%     for i=1:length(audio_sample(:,1))
-%         wfname1 = [pass,'sample_noRE_scene',num2str(i),'_bpm',num2str(bpm),...
-%             '_bars',num2str(bars),'_bpb',num2str(beatperbar),'.wav'];
-%         wfname2 = [pass,'sample_hiRE_scene',num2str(i),'_bpm',num2str(bpm),...
-%             '_bars',num2str(bars),'_bpb',num2str(beatperbar),'.wav'];
-%         wfname3 = [pass,'sample_loRE_scene',num2str(i),'_bpm',num2str(bpm),...
-%             '_bars',num2str(bars),'_bpb',num2str(beatperbar),'.wav'];
-%         wfname4 = [pass,'sample_nomake_scene',num2str(i),'.wav'];
-%         audiowrite(wfname1,audio_noRE(i,:),fs);
-%         audiowrite(wfname2,audio_hiRE(i,:),fs);
-%         audiowrite(wfname3,audio_loRE(i,:),fs);
-%         audiowrite(wfname4,audio_random(i,:),fs);
-%     end
-% end
-
-num_samp = length(audio_noRE(:,1));
-len_samp = length(audio_noRE(1,:));
+num_samp = length(audio_sample(:,1));
+len_samp = length(audio_sample(1,:));
 outaudio = zeros(1,num_samp*len_samp);
 for i=1:num_samp
-    outaudio(((i-1)*len_samp+1):(i*len_samp)) = audio_noRE(i,:);
+    audiowrite(['out',num2str(i),'.wav'],audio_sample(i,:),fs_input);
 end
-audiowrite('out.wav',outaudio,fs);

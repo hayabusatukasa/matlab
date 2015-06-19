@@ -104,20 +104,26 @@ elseif (locs_valley(aoBeats)+bisample-1)>length(audio_input)
 else
     % 検出したピークを起点にして，ビートごとに音をつなぎ合わせる
     audio_output = zeros(1,aoSampleLength);
+    s_start_plot = zeros(1,aoBeats);
+    s_end_plot = zeros(1,aoBeats);
     for i=1:aoBeats
         valley1 = locs_valley(i);
         valley2 = locs_valley(i+1)-1;
         val2val = valley2-valley1;
-        % バレー間が2.0ビートより小さい場合，1ビートに波形伸長圧縮をする
-        if val2val < bisample*2.0
+        % バレー間が1.5ビートより小さい場合，1ビートに波形伸長圧縮をする
+        if val2val < bisample*1.5
             a_org = audio_input(valley1:valley2);
             a_conv = ConvertAudioSpeed(a_org,fs,bisample);
             audio_output(((i-1)*bisample+1):i*bisample) = a_conv;
-        % そうでなければ，1ビート分を持ってくるだけ
+        % そうでなければ，1.5ビート分を持ってきて1ビートに波形圧縮
         else
-            a_org = audio_input(valley1:(valley1+bisample-1));
-            audio_output(((i-1)*bisample+1):i*bisample) = a_org;
+           valley2 = valley1+round(1.5*bisample)-1;
+           a_org = audio_input(valley1:valley2);
+           a_conv = ConvertAudioSpeed(a_org,fs,bisample);
+           audio_output(((i-1)*bisample+1):i*bisample) = a_conv;
         end
+        s_start_plot(i) = valley1;
+        s_end_plot(i) = valley2;
     end
 end
 
@@ -128,10 +134,12 @@ if is_plot ~= 0
     hold on;
     plot(t,audio_input,'Color','b');
     if aoBeats==1
-        plot(t(s_start_plot:s_end_plot),audio_plot,'Color','r');
+        plot(t(s_start_plot:s_end_plot),...
+            audio_input(s_start_plot:s_end_plot),'Color','r');
     else
         for i=1:aoBeats
-            plot(t(s_start_plot(i):s_end_plot(i)),audio_plot(i,:),'Color','r');
+            plot(t(s_start_plot(i):s_end_plot(i)),...
+                audio_input(s_start_plot(i):s_end_plot(i)),'Color','r');
         end
     end
     hold off;
@@ -165,7 +173,7 @@ if is_plot ~= 0
     xlabel('Beat');
     ylabel('Amplitude');
     xlim([0,aoBeats]);
-    %ylim([-1.0,1.0]);
+    ylim([-1.0,1.0]);
 end
 
 end

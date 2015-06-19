@@ -12,8 +12,14 @@ else
     return;
 end
 
-audio_output = resample(audio_output,convert_length,length(audio_output));
-%audio_output = audio_output(1:convert_length);
+%audio_output = resample(audio_output,convert_length,length(audio_output));
+
+if length(audio_output)>convert_length
+    audio_output = audio_output(1:convert_length);
+elseif length(audio_output)<convert_length
+    t = convert_length - length(audio_output);
+    audio_output = vertcat(audio_output, zeros(t,1));
+end
 
 end
 

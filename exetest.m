@@ -1,8 +1,9 @@
-clear all;
+function exetest(filename, music_fname)
+
 %% ëOèàóù
-fname_withoutWAV = '141121_001';
-music_fname = 'pop.00050.au';
-filename = [fname_withoutWAV,'.wav'];
+% fname_withoutWAV = '141121_001';
+music_fname = music_fname;
+% filename = [fname_withoutWAV,'.wav'];
 pass = [];
 a_info = audioinfo(filename);
 fs = a_info.SampleRate;
