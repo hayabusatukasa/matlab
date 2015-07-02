@@ -1,5 +1,5 @@
 function audio_output = audioSampleGenerator3...
-    (audio_input,fs,tau,bpm,bars,beatperbar,noteunit,is_plot)
+    (audio_music,fs_music,audio_input,fs,tau,bars,beatperbar,noteunit,is_plot)
 % audio_output = audioSampleGenerator...
 %   (audio_input,fs,tau,bpm,bars,beatperbar,noteunit,is_plot)
 % ‰¹Šy‘fŞì¬ŠÖ”
@@ -18,6 +18,9 @@ function audio_output = audioSampleGenerator3...
 %     audio_output : ‰¹Šy‘fŞ
 
 % audio_output‚Ì•b”‚ğæ“¾
+ma = miraudio(audio_music,fs_music);
+mtempo = mirtempo(ma);
+bpm = mirgetdata(mtempo);
 beat_interval = 60/bpm*(noteunit/beatperbar); % [sec]
 aoBeats = bars*beatperbar;
 bisample = round(beat_interval*fs); % [sample]

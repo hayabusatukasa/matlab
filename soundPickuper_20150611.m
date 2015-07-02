@@ -1,7 +1,7 @@
 clear all;
 %% 前処理
-fname_withoutWAV = 'I:\VOICE\FOLDER05\141024_001';
-music_fname = 'pop.00050.au';
+fname_withoutWAV = '141111_001';
+music_fname = 'クロスロード.m4a';
 filename = [fname_withoutWAV,'.wav'];
 pass = [];
 a_info = audioinfo(filename);
@@ -11,10 +11,10 @@ dur = a_info.Duration;
 is_getaudio = 1;
 
 %% 音楽データのテンポ推定
-[audio_music, fs_music] = audioread(music_fname);
-ma = miraudio(audio_music,fs_music);
-mtmp = mirtempo(ma);
-tempo = mirgetdata(mtmp);
+% [audio_music, fs_music] = audioread(music_fname);
+% ma = miraudio(audio_music,fs_music);
+% mtmp = mirtempo(ma);
+% tempo = mirgetdata(mtmp);
 
 %% フレームごとのパラメータ取得
 deltaT = 1.0;   % フレーム分解能
@@ -106,8 +106,12 @@ for i=1:length(str_random)
     end
 end
 
-ao_sec = 10;
-amSampleLength = fs_music*ao_sec;
+[audio_music,fs_music] = audioread(music_fname);
+audio_music = audio_music(:,1);
+
+ao_sec = 11;
+fade_sec = 1;
+amSampleLength = fs_music*(ao_sec-fade_sec);
 aoSampleLength = fs_input*ao_sec;
 num_parts = floor(length(audio_music)/amSampleLength);
 audio_sample = zeros(num_parts,aoSampleLength);
@@ -122,17 +126,25 @@ for i=1:num_parts
         a_tmp = a_tmp(:,1);
         index = (i-1)*amSampleLength;
         audio_sample(i,:) = audioSampleGenerator5...
-            (audio_music((index+1):(index+amSampleLength)),...
-            fs_music,a_tmp,fs_input,ao_sec,0.1,1.0,1.5);
+            (audio_music((index+1):(index+aoSampleLength)),...
+            fs_music,a_tmp,fs_input,ao_sec,0.2,0.8,1.2);
     else
         display(['Scene ',num2str(i),' audio sample generate skipped']);
     end
 end
 
 %% 音楽用サンプルを書き出す
-num_samp = length(audio_sample(:,1));
-len_samp = length(audio_sample(1,:));
-outaudio = zeros(1,num_samp*len_samp);
-for i=1:num_samp
-    audiowrite(['out',num2str(i),'.wav'],audio_sample(i,:),fs_input);
+fade_sec_rest = ao_sec - 2*fade_sec;
+fade1 = linspace(0,1,fs_input*fade_sec);
+fade2 = linspace(1,0,fs_input*fade_sec);
+fade_rest = linspace(1,1,fs_input*fade_sec_rest);
+fade = horzcat(fade1,fade_rest,fade2);
+audio_out = zeros(1,num_parts*(fs_input*(ao_sec-fade_sec))+fs_input*fade_sec);
+for i=1:num_parts
+    st = (i-1)*fs_input*(ao_sec-fade_sec)+1;
+    en = st + aoSampleLength-1;
+    a_tmp = audio_sample(i,:).*fade;
+    audio_out(st:en) = audio_out(st:en)+a_tmp;
 end
+
+audiowrite(['out','.wav'],audio_out,fs_input);

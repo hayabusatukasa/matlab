@@ -1,5 +1,6 @@
-function audio_output = audioSampleGenerator5...
-    (audio_music,fs_music,audio_input,fs_input,ao_sec,tau,contrast,min_speed,max_speed)
+function audio_output = audioSampleGenerator6...
+    (bpm,beatperbar,noteunit,audio_input,fs_input,ao_sec,tau,contrast,...
+    min_speed,max_speed)
 % audio_output = audioSampleGenerator...
 %   (audio_input,fs,tau,bpm,bars,beatperbar,noteunit,is_plot)
 % 音楽素材作成関数
@@ -18,10 +19,20 @@ function audio_output = audioSampleGenerator5...
 %     audio_output : 音楽素材
 
 % onsetの取得
-ma1 = miraudio(audio_music,fs_music);
-menv1 = mirenvelope(ma1,'Tau',tau);
-monset1 = mironsets(menv1,'Contrast',contrast);
-onset1 = mirgetdata(monset1);
+% ma1 = miraudio(audio_music,fs_music);
+% menv1 = mirenvelope(ma1,'Tau',tau);
+% monset1 = mironsets(menv1,'Attack','Contrast',contrast);
+% onset1 = mirgetdata(monset1);
+% st = onset1(1);
+% mtempo = mirtempo(ma1);
+% bpm = mirgetdata(mtempo);
+% beatperbar = 4;
+% noteunit = 4;
+beat_interval = 60/bpm*(noteunit/beatperbar); % [sec]
+onset1 = zeros(1,1000);
+for i=1:1000
+    onset1(i) = i*beat_interval;
+end
 
 ma2 = miraudio(audio_input,fs_input);
 
@@ -40,7 +51,7 @@ else
 end
 
 menv2 = mirenvelope(ma2,'Tau',tau);
-monset2 = mironsets(menv2,'Contrast',contrast);
+monset2 = mironsets(menv2,'Attack','Contrast',contrast);
 onset2 = mirgetdata(monset2);
 
 % onset2が2より少ないとき，audio_inputを切り取って返す
@@ -51,7 +62,7 @@ if numel(onset2)<2
 end
 
 % onsetの秒からサンプル単位への変換
-onset1_insamp = [1;floor(onset1*fs_input)];
+onset1_insamp = [1,floor(onset1*fs_input)];
 onset2_insamp = [1;floor(onset2*fs_input)];
 
 audio_output = zeros(1,ao_sec*fs_input);
@@ -67,15 +78,15 @@ ons2ons34 = ons4-ons3+1;
 ratio = ons2ons34/ons2ons12;
 
 while 1
+    disp([num2str(n_ons1),'/',num2str(length(onset1_insamp))]);
     if min_speed < ratio && ratio < max_speed
-        disp(['music:',num2str(n_ons1),' voice:',num2str(n_ons2)]);
         a_org = audio_input(ons3:ons4);
         a_conv = ConvertAudioSpeed(a_org,fs_input,ons2ons12);
         
         % リズム強調
         decay = floor(length(a_conv)/2)-10;
         sustain = ceil(length(a_conv)/2)-10;
-        envelope = getADSR(10,decay,sustain,10,0,1.0,0.8,0)';
+        envelope = getADSR(10,decay,sustain,10,0,1.0,0.5,0)';
         a_conv = a_conv.*envelope;
         
         audio_output(ons1:ons2) = a_conv;
